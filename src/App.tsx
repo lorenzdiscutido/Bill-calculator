@@ -38,6 +38,7 @@ export default function App() {
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [quickTenantName, setQuickTenantName] = useState<string>('');
+  const [mobileArchiveOpen, setMobileArchiveOpen] = useState<boolean>(false);
 
   const activeRecord = useMemo(() => {
     return (
@@ -392,54 +393,56 @@ export default function App() {
             </span>
           )}
 
-          <button
-            type="button"
-            className="btn btn-shell"
-            onClick={handleManualSaveConfirm}
-          >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <div className="topbar-btn-group">
+            <button
+              type="button"
+              className="btn btn-shell"
+              onClick={handleManualSaveConfirm}
             >
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-              <polyline points="17 21 17 13 7 13 7 21" />
-              <polyline points="7 3 7 8 15 8" />
-            </svg>
-            Save Month
-          </button>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                <polyline points="17 21 17 13 7 13 7 21" />
+                <polyline points="7 3 7 8 15 8" />
+              </svg>
+              Save Month
+            </button>
 
-          <button
-            type="button"
-            className="btn btn-primary"
-            disabled={!splitResult.isValid || exportingId !== null}
-            onClick={handleExportCombined}
-          >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={!splitResult.isValid || exportingId !== null}
+              onClick={handleExportCombined}
             >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            {exportingId === 'combined'
-              ? 'Generating PDF…'
-              : 'Export Combined PDF'}
-          </button>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {exportingId === 'combined'
+                ? 'Generating PDF…'
+                : 'Export Combined PDF'}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -447,85 +450,107 @@ export default function App() {
         {/* Left History Rail */}
         <aside className="archive-rail" aria-label="Billing Month History">
           <div className="rail-header">
-            <h2 className="rail-heading">Saved Billing Months</h2>
-            <button
-              type="button"
-              className="btn-ghost-sm"
-              onClick={handleCreateNewMonth}
-            >
-              + New Month
-            </button>
+            <div>
+              <h2 className="rail-heading">Saved Billing Months ({savedMonths.length})</h2>
+              <span className="rail-active-indicator">Current: {activeMonthTitle}</span>
+            </div>
+            <div className="rail-header-btns">
+              <button
+                type="button"
+                className="btn-ghost-sm"
+                onClick={handleCreateNewMonth}
+              >
+                + New Month
+              </button>
+              <button
+                type="button"
+                className="btn-ghost-sm mobile-history-toggle"
+                onClick={() => setMobileArchiveOpen((prev) => !prev)}
+                aria-expanded={mobileArchiveOpen}
+              >
+                {mobileArchiveOpen ? 'Hide History ▲' : 'Past Months ▼'}
+              </button>
+            </div>
           </div>
 
-          <ul className="archive-list">
-            {savedMonths.map((item) => {
-              const parsedBill = parsePesosToCentavos(item.billAmountInput);
-              const formattedBill =
-                parsedBill.centavos !== null
-                  ? formatCentavos(parsedBill.centavos)
-                  : '₱0.00';
-              const isSelected = item.id === activeRecord.id;
-              const label = `${MONTH_NAMES[item.month - 1]} ${item.year}`;
+          <div
+            className={`archive-collapsible-content ${
+              mobileArchiveOpen ? 'is-open' : ''
+            }`}
+          >
+            <ul className="archive-list">
+              {savedMonths.map((item) => {
+                const parsedBill = parsePesosToCentavos(item.billAmountInput);
+                const formattedBill =
+                  parsedBill.centavos !== null
+                    ? formatCentavos(parsedBill.centavos)
+                    : '₱0.00';
+                const isSelected = item.id === activeRecord.id;
+                const label = `${MONTH_NAMES[item.month - 1]} ${item.year}`;
 
-              return (
-                <li
-                  key={item.id}
-                  className={`archive-item ${isSelected ? 'is-active' : ''}`}
-                >
-                  <button
-                    type="button"
-                    className="archive-select-btn"
-                    onClick={() => setActiveMonthId(item.id)}
+                return (
+                  <li
+                    key={item.id}
+                    className={`archive-item ${isSelected ? 'is-active' : ''}`}
                   >
-                    <div className="archive-item-top">
-                      <span className="archive-month-name">{label}</span>
-                      <span className="archive-bill-amount">{formattedBill}</span>
-                    </div>
-                    <div className="archive-item-meta">
-                      <span>
-                        {item.tenants.length}{' '}
-                        {item.tenants.length === 1 ? 'tenant' : 'tenants'}
-                      </span>
-                      <span>
-                        {item.periodStart} – {item.periodEnd.slice(5)}
-                      </span>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    className="archive-delete-btn"
-                    onClick={() => handleDeleteMonth(item.id)}
-                    aria-label={`Delete ${label}`}
-                    title={`Delete ${label}`}
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.75"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+                    <button
+                      type="button"
+                      className="archive-select-btn"
+                      onClick={() => {
+                        setActiveMonthId(item.id);
+                        setMobileArchiveOpen(false);
+                      }}
                     >
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                    </svg>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+                      <div className="archive-item-top">
+                        <span className="archive-month-name">{label}</span>
+                        <span className="archive-bill-amount">{formattedBill}</span>
+                      </div>
+                      <div className="archive-item-meta">
+                        <span>
+                          {item.tenants.length}{' '}
+                          {item.tenants.length === 1 ? 'tenant' : 'tenants'}
+                        </span>
+                        <span>
+                          {item.periodStart} – {item.periodEnd.slice(5)}
+                        </span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      className="archive-delete-btn"
+                      onClick={() => handleDeleteMonth(item.id)}
+                      aria-label={`Delete ${label}`}
+                      title={`Delete ${label}`}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.75"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                      </svg>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
 
-          <div className="rail-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleRestoreSampleData}
-            >
-              Load Sample Dataset (3 Tenants)
-            </button>
+            <div className="rail-footer">
+              <button
+                type="button"
+                className="btn btn-secondary btn-full-width"
+                onClick={handleRestoreSampleData}
+              >
+                Load Sample Dataset (3 Tenants)
+              </button>
+            </div>
           </div>
         </aside>
 
@@ -556,7 +581,7 @@ export default function App() {
             </div>
 
             <div className="setup-grid">
-              <div className="field-group">
+              <div className="field-group field-group-month">
                 <div className="field-label-row">
                   <label htmlFor="billing-month-select" className="field-label">
                     Billing Month
@@ -581,7 +606,7 @@ export default function App() {
                 </select>
               </div>
 
-              <div className="field-group">
+              <div className="field-group field-group-year">
                 <div className="field-label-row">
                   <label htmlFor="billing-year-input" className="field-label">
                     Billing Year
@@ -603,7 +628,7 @@ export default function App() {
                 />
               </div>
 
-              <div className="field-group">
+              <div className="field-group field-group-bill">
                 <div className="field-label-row">
                   <label htmlFor="bill-amount-input" className="field-label">
                     Total Bill Amount (₱)
@@ -638,7 +663,7 @@ export default function App() {
                 )}
               </div>
 
-              <div className="field-group">
+              <div className="field-group field-group-period">
                 <div className="field-label-row">
                   <span className="field-label">Billing Period Dates</span>
                   <span className="field-hint">
@@ -826,7 +851,7 @@ export default function App() {
                   >
                     <div className="tenant-row-grid">
                       {/* Tenant Name */}
-                      <div className="field-group">
+                      <div className="field-group field-group-name">
                         <label
                           htmlFor={`tenant-name-${tenant.id}`}
                           className="field-label"
@@ -850,7 +875,7 @@ export default function App() {
                       </div>
 
                       {/* Stay Entry Mode */}
-                      <div className="field-group">
+                      <div className="field-group field-group-mode">
                         <span className="field-label">Stay Entry Method</span>
                         <div
                           className="mode-segmented"
@@ -889,7 +914,7 @@ export default function App() {
 
                       {/* Stay Dates OR Manual Days Input */}
                       {tenant.mode === 'dates' ? (
-                        <div className="field-group">
+                        <div className="field-group field-group-dates">
                           <div className="field-label-row">
                             <span className="field-label">
                               Stay Start &amp; End (Inclusive)
@@ -925,7 +950,7 @@ export default function App() {
                           </div>
                         </div>
                       ) : (
-                        <div className="field-group">
+                        <div className="field-group field-group-manual">
                           <label
                             htmlFor={`tenant-manual-${tenant.id}`}
                             className="field-label"
@@ -953,7 +978,7 @@ export default function App() {
                       )}
 
                       {/* Counted Days Readout */}
-                      <div className="field-group">
+                      <div className="field-group field-group-days">
                         <span className="field-label">Counted Stay</span>
                         <div className="stay-days-readout">
                           <span>{tCalc?.daysStayed ?? 0}</span>
@@ -964,7 +989,7 @@ export default function App() {
                       </div>
 
                       {/* Delete Tenant Action */}
-                      <div className="field-group">
+                      <div className="field-group field-group-action">
                         <button
                           type="button"
                           className="btn-danger-sm"
@@ -1167,6 +1192,9 @@ export default function App() {
 
                 {/* Per-Tenant Split Table */}
                 <div className="table-scroll-wrapper">
+                  <div className="table-scroll-hint" aria-hidden="true">
+                    <span>Swipe horizontally to view full table &rarr;</span>
+                  </div>
                   <table className="results-table">
                     <thead>
                       <tr>
