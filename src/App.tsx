@@ -1,3 +1,4 @@
+import styles from './App.module.css';
 import { ArchiveRail } from './components/ArchiveRail';
 import { BillingForm } from './components/BillingForm';
 import { ResultsTable } from './components/ResultsTable';
@@ -51,7 +52,7 @@ export default function App() {
         onExportCombined={handleExportCombined}
       />
 
-      <div className="workbench-layout">
+      <div className={styles.workbenchLayout}>
         <ArchiveRail
           savedMonths={savedMonths}
           activeMonthId={activeRecord.id}
@@ -64,7 +65,7 @@ export default function App() {
           onRestoreSampleData={handleRestoreSampleData}
         />
 
-        <main className="main-workspace">
+        <main className={styles.mainWorkspace}>
           <BillingForm
             activeRecord={activeRecord}
             activeMonthTitle={activeMonthTitle}

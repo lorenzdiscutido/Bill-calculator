@@ -3,6 +3,7 @@ import {
   TenantCalculationResult,
   TenantStayInput,
 } from '../types';
+import styles from './TenantRow.module.css';
 
 export interface TenantRowProps {
   tenant: TenantStayInput;
@@ -20,21 +21,21 @@ export function TenantRow({
   onDeleteTenant,
 }: TenantRowProps) {
   return (
-    <div className={`tenant-row ${rowError ? 'has-error' : ''}`}>
-      <div className="tenant-row-grid">
+    <div className={`${styles.tenantRow} ${rowError ? styles.hasError : ''}`}>
+      <div className={styles.tenantRowGrid}>
         {/* Tenant Name */}
-        <div className="field-group field-group-name">
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupName}`}>
           <label
             htmlFor={`tenant-name-${tenant.id}`}
-            className="field-label"
+            className={styles.fieldLabel}
           >
             Tenant Name
           </label>
           <input
             id={`tenant-name-${tenant.id}`}
             type="text"
-            className={`input-control ${
-              !tenant.name.trim() ? 'is-invalid' : ''
+            className={`${styles.inputControl} ${
+              !tenant.name.trim() ? styles.isInvalid : ''
             }`}
             value={tenant.name}
             onChange={(e) =>
@@ -47,17 +48,17 @@ export function TenantRow({
         </div>
 
         {/* Stay Entry Mode */}
-        <div className="field-group field-group-mode">
-          <span className="field-label">Stay Entry Method</span>
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupMode}`}>
+          <span className={styles.fieldLabel}>Stay Entry Method</span>
           <div
-            className="mode-segmented"
+            className={styles.modeSegmented}
             role="group"
             aria-label={`Stay entry method for ${tenant.name || 'tenant'}`}
           >
             <button
               type="button"
-              className={`mode-segment-btn ${
-                tenant.mode === 'dates' ? 'is-selected' : ''
+              className={`${styles.modeSegmentBtn} ${
+                tenant.mode === 'dates' ? styles.isSelected : ''
               }`}
               onClick={() =>
                 onUpdateTenant(tenant.id, {
@@ -69,8 +70,8 @@ export function TenantRow({
             </button>
             <button
               type="button"
-              className={`mode-segment-btn ${
-                tenant.mode === 'manual' ? 'is-selected' : ''
+              className={`${styles.modeSegmentBtn} ${
+                tenant.mode === 'manual' ? styles.isSelected : ''
               }`}
               onClick={() =>
                 onUpdateTenant(tenant.id, {
@@ -86,20 +87,20 @@ export function TenantRow({
 
         {/* Stay Dates OR Manual Days Input */}
         {tenant.mode === 'dates' ? (
-          <div className="field-group field-group-dates">
-            <div className="field-label-row">
-              <span className="field-label">
+          <div className={`${styles.fieldGroup} ${styles.fieldGroupDates}`}>
+            <div className={styles.fieldLabelRow}>
+              <span className={styles.fieldLabel}>
                 Stay Start &amp; End (Inclusive)
               </span>
             </div>
-            <div className="date-pair-grid">
-              <div className="date-input-wrap">
-                <span className="date-input-label">Check-in</span>
+            <div className={styles.datePairGrid}>
+              <div className={styles.dateInputWrap}>
+                <span className={styles.dateInputLabel}>Check-in</span>
                 <input
                   type="date"
                   aria-label={`Start date for ${tenant.name}`}
-                  className={`input-control tabular ${
-                    rowError ? 'is-invalid' : ''
+                  className={`${styles.inputControl} tabular ${
+                    rowError ? styles.isInvalid : ''
                   }`}
                   value={tenant.startDate}
                   onChange={(e) =>
@@ -109,13 +110,13 @@ export function TenantRow({
                   }
                 />
               </div>
-              <div className="date-input-wrap">
-                <span className="date-input-label">Check-out</span>
+              <div className={styles.dateInputWrap}>
+                <span className={styles.dateInputLabel}>Check-out</span>
                 <input
                   type="date"
                   aria-label={`End date for ${tenant.name}`}
-                  className={`input-control tabular ${
-                    rowError ? 'is-invalid' : ''
+                  className={`${styles.inputControl} tabular ${
+                    rowError ? styles.isInvalid : ''
                   }`}
                   value={tenant.endDate}
                   onChange={(e) =>
@@ -128,10 +129,10 @@ export function TenantRow({
             </div>
           </div>
         ) : (
-          <div className="field-group field-group-manual">
+          <div className={`${styles.fieldGroup} ${styles.fieldGroupManual}`}>
             <label
               htmlFor={`tenant-manual-${tenant.id}`}
-              className="field-label"
+              className={styles.fieldLabel}
             >
               Manual Days Stayed
             </label>
@@ -141,8 +142,8 @@ export function TenantRow({
               min={0}
               max={366}
               step={1}
-              className={`input-control tabular ${
-                rowError ? 'is-invalid' : ''
+              className={`${styles.inputControl} tabular ${
+                rowError ? styles.isInvalid : ''
               }`}
               value={tenant.manualDays}
               onChange={(e) =>
@@ -156,21 +157,21 @@ export function TenantRow({
         )}
 
         {/* Counted Days Readout */}
-        <div className="field-group field-group-days">
-          <span className="field-label">Counted Stay</span>
-          <div className="stay-days-readout">
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupDays}`}>
+          <span className={styles.fieldLabel}>Counted Stay</span>
+          <div className={styles.stayDaysReadout}>
             <span>{tCalc?.daysStayed ?? 0}</span>
-            <span className="field-hint">
+            <span className={styles.fieldHint}>
               {(tCalc?.daysStayed ?? 0) === 1 ? 'day' : 'days'}
             </span>
           </div>
         </div>
 
         {/* Delete Tenant Action */}
-        <div className="field-group field-group-action">
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupAction}`}>
           <button
             type="button"
-            className="btn-danger-sm"
+            className={styles.btnDangerSm}
             onClick={() => onDeleteTenant(tenant.id)}
             aria-label={`Remove ${tenant.name || 'tenant'}`}
           >
@@ -194,13 +195,13 @@ export function TenantRow({
       </div>
 
       {(rowError || tCalc?.wasClipped) && (
-        <div className="tenant-row-footnote">
+        <div className={styles.tenantRowFootnote}>
           {rowError ? (
-            <p className="field-error-text" role="alert">
+            <p className={styles.fieldErrorText} role="alert">
               {rowError}
             </p>
           ) : tCalc?.wasClipped ? (
-            <span className="clipped-badge">
+            <span className={styles.clippedBadge}>
               {tCalc.clippedStart && tCalc.clippedEnd
                 ? `Clipped to billing period: ${tCalc.clippedStart} – ${tCalc.clippedEnd} (${tCalc.daysStayed} days counted)`
                 : 'Dates fall completely outside the billing period (0 days counted)'}

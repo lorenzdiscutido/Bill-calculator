@@ -1,3 +1,5 @@
+import styles from './ActionPanel.module.css';
+
 export interface ActionPanelProps {
   variant?: 'topbar' | 'results-header';
   isValid: boolean;
@@ -17,7 +19,7 @@ export function ActionPanel({
     return (
       <button
         type="button"
-        className="btn btn-primary"
+        className={`${styles.btn} ${styles.btnPrimary} ${styles.resultsHeaderBtn}`}
         disabled={!isValid || exportingId !== null}
         onClick={onExportCombined}
       >
@@ -27,11 +29,11 @@ export function ActionPanel({
   }
 
   return (
-    <div className="topbar-btn-group">
+    <div className={styles.topbarBtnGroup}>
       {onSaveMonth && (
         <button
           type="button"
-          className="btn btn-shell"
+          className={`${styles.btn} ${styles.btnShell}`}
           onClick={onSaveMonth}
         >
           <svg
@@ -55,7 +57,7 @@ export function ActionPanel({
 
       <button
         type="button"
-        className="btn btn-primary"
+        className={`${styles.btn} ${styles.btnPrimary}`}
         disabled={!isValid || exportingId !== null}
         onClick={onExportCombined}
       >

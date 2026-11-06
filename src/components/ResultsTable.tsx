@@ -2,6 +2,7 @@ import { formatCentavos } from '../calculator';
 import { BillingMonthRecord, BillSplitResult } from '../types';
 import { ActionPanel } from './ActionPanel';
 import { OccupancyTimeline } from './OccupancyTimeline';
+import styles from './ResultsTable.module.css';
 
 export interface ResultsTableProps {
   activeRecord: BillingMonthRecord;
@@ -19,13 +20,13 @@ export function ResultsTable({
   onExportSingle,
 }: ResultsTableProps) {
   return (
-    <section className="workspace-panel" aria-labelledby="results-heading">
-      <div className="section-header">
+    <section className={styles.workspacePanel} aria-labelledby="results-heading">
+      <div className={styles.sectionHeader}>
         <div>
-          <h2 id="results-heading" className="section-heading">
+          <h2 id="results-heading" className={styles.sectionHeading}>
             Bill Allocation &amp; Per-Tenant Shares
           </h2>
-          <p className="section-note">
+          <p className={styles.sectionNote}>
             Vacant calendar days are ignored so 100% of the utility bill is
             recovered across active tenant-days.
           </p>
@@ -39,11 +40,11 @@ export function ResultsTable({
       </div>
 
       {!splitResult.isValid ? (
-        <div className="validation-alert" role="alert">
-          <h3 className="validation-alert-title">
+        <div className={styles.validationAlert} role="alert">
+          <h3 className={styles.validationAlertTitle}>
             Resolve the following before calculating shares:
           </h3>
-          <ul className="validation-alert-list">
+          <ul className={styles.validationAlertList}>
             {splitResult.errors.map((err, i) => (
               <li key={i}>{err}</li>
             ))}
@@ -61,10 +62,10 @@ export function ResultsTable({
           />
 
           {/* Transparent Per-Day Rate & Centavo Reconciliation Bar */}
-          <div className="formula-strip">
-            <div className="formula-equation">
+          <div className={styles.formulaStrip}>
+            <div className={styles.formulaEquation}>
               <span>Per-Day Rate:</span>
-              <span className="formula-rate-highlight">
+              <span className={styles.formulaRateHighlight}>
                 {formatCentavos(splitResult.perDayRateRoundedCentavos)} /
                 tenant-day
               </span>
@@ -74,7 +75,7 @@ export function ResultsTable({
               </span>
             </div>
 
-            <span className="reconciled-pill">
+            <span className={styles.reconciledPill}>
               <svg
                 width="14"
                 height="14"
@@ -99,27 +100,27 @@ export function ResultsTable({
           </div>
 
           {/* Per-Tenant Split Table */}
-          <div className="table-scroll-wrapper">
-            <div className="table-scroll-hint" aria-hidden="true">
+          <div className={styles.tableScrollWrapper}>
+            <div className={styles.tableScrollHint} aria-hidden="true">
               <span>Swipe horizontally to view full table &rarr;</span>
             </div>
-            <table className="results-table">
+            <table className={styles.resultsTable}>
               <thead>
                 <tr>
                   <th scope="col">Tenant Name</th>
-                  <th scope="col" className="col-num">
+                  <th scope="col" className={styles.colNum}>
                     Days Stayed
                   </th>
-                  <th scope="col" className="col-num">
+                  <th scope="col" className={styles.colNum}>
                     Share Ratio
                   </th>
-                  <th scope="col" className="col-num">
+                  <th scope="col" className={styles.colNum}>
                     Per-Day Rate
                   </th>
-                  <th scope="col" className="col-num">
+                  <th scope="col" className={styles.colNum}>
                     Amount Due (₱)
                   </th>
-                  <th scope="col" className="col-action">
+                  <th scope="col" className={styles.colAction}>
                     Individual PDF
                   </th>
                 </tr>
@@ -128,8 +129,10 @@ export function ResultsTable({
                 {splitResult.tenantResults.map((tCalc) => (
                   <tr key={tCalc.tenantId}>
                     <td>
-                      <div className="tenant-cell-primary">{tCalc.name}</div>
-                      <div className="tenant-cell-sub tabular">
+                      <div className={styles.tenantCellPrimary}>
+                        {tCalc.name}
+                      </div>
+                      <div className={`${styles.tenantCellSub} tabular`}>
                         {tCalc.mode === 'manual'
                           ? 'Manual day entry'
                           : tCalc.clippedStart && tCalc.clippedEnd
@@ -139,24 +142,24 @@ export function ResultsTable({
                             : 'Outside billing period'}
                       </div>
                     </td>
-                    <td className="col-num">
+                    <td className={styles.colNum}>
                       {tCalc.daysStayed}{' '}
                       {tCalc.daysStayed === 1 ? 'day' : 'days'}
                     </td>
-                    <td className="col-num">
+                    <td className={styles.colNum}>
                       {tCalc.daysStayed}/{splitResult.totalTenantDays} (
                       {tCalc.sharePercentage.toFixed(1)}%)
                     </td>
-                    <td className="col-num">
+                    <td className={styles.colNum}>
                       {formatCentavos(splitResult.perDayRateRoundedCentavos)}
                     </td>
-                    <td className="col-num">
+                    <td className={styles.colNum}>
                       <strong>
                         {formatCentavos(tCalc.finalShareCentavos)}
                       </strong>
                       {tCalc.adjustmentCentavos !== 0 && (
                         <span
-                          className="adj-badge"
+                          className={styles.adjBadge}
                           title="Centavo rounding remainder assigned to the tenant with the largest share"
                         >
                           {tCalc.adjustmentCentavos > 0 ? '+' : ''}
@@ -164,10 +167,10 @@ export function ResultsTable({
                         </span>
                       )}
                     </td>
-                    <td className="col-action">
+                    <td className={styles.colAction}>
                       <button
                         type="button"
-                        className="btn-ghost-sm"
+                        className={styles.btnGhostSm}
                         onClick={() => onExportSingle(tCalc.tenantId)}
                         disabled={exportingId !== null}
                       >
@@ -188,15 +191,15 @@ export function ResultsTable({
                       : 'tenants'}
                     )
                   </td>
-                  <td className="col-num">
+                  <td className={styles.colNum}>
                     {splitResult.totalTenantDays} days
                   </td>
-                  <td className="col-num">100.0%</td>
-                  <td className="col-num">
+                  <td className={styles.colNum}>100.0%</td>
+                  <td className={styles.colNum}>
                     {formatCentavos(splitResult.perDayRateRoundedCentavos)}
                     /day
                   </td>
-                  <td className="col-num">
+                  <td className={styles.colNum}>
                     <div>
                       Shares: {formatCentavos(splitResult.totalSharesCentavos)}
                     </div>
@@ -204,7 +207,7 @@ export function ResultsTable({
                       Bill: {formatCentavos(splitResult.totalBillCentavos)}
                     </div>
                   </td>
-                  <td className="col-action">Reconciled</td>
+                  <td className={styles.colAction}>Reconciled</td>
                 </tr>
               </tfoot>
             </table>

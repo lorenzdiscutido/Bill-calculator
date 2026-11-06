@@ -1,5 +1,6 @@
 import { MONTH_NAMES } from '../calculator';
 import { BillingMonthRecord, ValidationFieldErrors } from '../types';
+import styles from './BillingForm.module.css';
 
 export interface BillingFormProps {
   activeRecord: BillingMonthRecord;
@@ -29,13 +30,13 @@ export function BillingForm({
   onResetPeriodToFullMonth,
 }: BillingFormProps) {
   return (
-    <section className="workspace-panel" aria-labelledby="setup-heading">
-      <div className="section-header">
+    <section className={styles.workspacePanel} aria-labelledby="setup-heading">
+      <div className={styles.sectionHeader}>
         <div>
-          <h2 id="setup-heading" className="section-heading">
+          <h2 id="setup-heading" className={styles.sectionHeading}>
             Billing Period &amp; Total Bill — {activeMonthTitle}
           </h2>
-          <p className="section-note">
+          <p className={styles.sectionNote}>
             Enter the total peso bill from your electric utility statement.
             Billing period defaults to the full calendar month.
           </p>
@@ -43,7 +44,7 @@ export function BillingForm({
         {isCustomPeriod && (
           <button
             type="button"
-            className="btn-ghost-sm"
+            className={styles.btnGhostSm}
             onClick={onResetPeriodToFullMonth}
           >
             Reset to Full Month ({defaultMonthBounds.start} –{' '}
@@ -52,16 +53,16 @@ export function BillingForm({
         )}
       </div>
 
-      <div className="setup-grid">
-        <div className="field-group field-group-month">
-          <div className="field-label-row">
-            <label htmlFor="billing-month-select" className="field-label">
+      <div className={styles.setupGrid}>
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupMonth}`}>
+          <div className={styles.fieldLabelRow}>
+            <label htmlFor="billing-month-select" className={styles.fieldLabel}>
               Billing Month
             </label>
           </div>
           <select
             id="billing-month-select"
-            className="select-control"
+            className={styles.selectControl}
             value={activeRecord.month}
             onChange={(e) =>
               onMonthOrYearChange(
@@ -78,9 +79,9 @@ export function BillingForm({
           </select>
         </div>
 
-        <div className="field-group field-group-year">
-          <div className="field-label-row">
-            <label htmlFor="billing-year-input" className="field-label">
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupYear}`}>
+          <div className={styles.fieldLabelRow}>
+            <label htmlFor="billing-year-input" className={styles.fieldLabel}>
               Billing Year
             </label>
           </div>
@@ -89,7 +90,7 @@ export function BillingForm({
             type="number"
             min={2000}
             max={2100}
-            className="input-control tabular"
+            className={`${styles.inputControl} tabular`}
             value={activeRecord.year}
             onChange={(e) =>
               onMonthOrYearChange(
@@ -100,23 +101,23 @@ export function BillingForm({
           />
         </div>
 
-        <div className="field-group field-group-bill">
-          <div className="field-label-row">
-            <label htmlFor="bill-amount-input" className="field-label">
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupBill}`}>
+          <div className={styles.fieldLabelRow}>
+            <label htmlFor="bill-amount-input" className={styles.fieldLabel}>
               Total Bill Amount (₱)
             </label>
-            <span className="field-hint">Utility total</span>
+            <span className={styles.fieldHint}>Utility total</span>
           </div>
-          <div className="peso-input-wrapper">
-            <span className="peso-prefix" aria-hidden="true">
+          <div className={styles.pesoInputWrapper}>
+            <span className={styles.pesoPrefix} aria-hidden="true">
               ₱
             </span>
             <input
               id="bill-amount-input"
               type="text"
               inputMode="decimal"
-              className={`input-control ${
-                fieldErrors.billAmount ? 'is-invalid' : ''
+              className={`${styles.inputControl} ${
+                fieldErrors.billAmount ? styles.isInvalid : ''
               }`}
               value={activeRecord.billAmountInput}
               onChange={(e) => onBillAmountChange(e.target.value)}
@@ -124,41 +125,41 @@ export function BillingForm({
             />
           </div>
           {fieldErrors.billAmount && (
-            <p className="field-error-text" role="alert">
+            <p className={styles.fieldErrorText} role="alert">
               {fieldErrors.billAmount}
             </p>
           )}
         </div>
 
-        <div className="field-group field-group-period">
-          <div className="field-label-row">
-            <span className="field-label">Billing Period Dates</span>
-            <span className="field-hint">
+        <div className={`${styles.fieldGroup} ${styles.fieldGroupPeriod}`}>
+          <div className={styles.fieldLabelRow}>
+            <span className={styles.fieldLabel}>Billing Period Dates</span>
+            <span className={styles.fieldHint}>
               {billingPeriodDays > 0
                 ? `${billingPeriodDays} days`
                 : 'Invalid range'}
             </span>
           </div>
-          <div className="date-pair-grid">
-            <div className="date-input-wrap">
-              <span className="date-input-label">Start Date</span>
+          <div className={styles.datePairGrid}>
+            <div className={styles.dateInputWrap}>
+              <span className={styles.dateInputLabel}>Start Date</span>
               <input
                 type="date"
                 aria-label="Billing Period Start Date"
-                className={`input-control tabular ${
-                  fieldErrors.periodDates ? 'is-invalid' : ''
+                className={`${styles.inputControl} tabular ${
+                  fieldErrors.periodDates ? styles.isInvalid : ''
                 }`}
                 value={activeRecord.periodStart}
                 onChange={(e) => onPeriodStartChange(e.target.value)}
               />
             </div>
-            <div className="date-input-wrap">
-              <span className="date-input-label">End Date</span>
+            <div className={styles.dateInputWrap}>
+              <span className={styles.dateInputLabel}>End Date</span>
               <input
                 type="date"
                 aria-label="Billing Period End Date"
-                className={`input-control tabular ${
-                  fieldErrors.periodDates ? 'is-invalid' : ''
+                className={`${styles.inputControl} tabular ${
+                  fieldErrors.periodDates ? styles.isInvalid : ''
                 }`}
                 value={activeRecord.periodEnd}
                 onChange={(e) => onPeriodEndChange(e.target.value)}
@@ -166,7 +167,7 @@ export function BillingForm({
             </div>
           </div>
           {fieldErrors.periodDates && (
-            <p className="field-error-text" role="alert">
+            <p className={styles.fieldErrorText} role="alert">
               {fieldErrors.periodDates}
             </p>
           )}

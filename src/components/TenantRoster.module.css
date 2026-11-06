@@ -1,0 +1,232 @@
+.workspacePanel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  padding: 1.25rem 1.5rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.sectionHeading {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.sectionNote {
+  margin: 0;
+  font-size: 0.84375rem;
+  color: var(--text-secondary);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4375rem;
+  height: 2.375rem;
+  padding: 0 0.875rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background-color: var(--accent-copper);
+  color: #ffffff;
+  border-color: var(--accent-copper);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background-color: var(--accent-copper-hover);
+  border-color: var(--accent-copper-hover);
+}
+
+.btnSecondary {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background-color: var(--bg-ground);
+  border-color: var(--text-primary);
+}
+
+.tenantQuickAddForm {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+  background-color: var(--bg-ground);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.quickAddInputWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.quickAddIcon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-placeholder);
+  pointer-events: none;
+  display: inline-flex;
+}
+
+.inputControl {
+  width: 100%;
+  max-width: 100%;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.inputControl::placeholder {
+  color: var(--text-placeholder);
+}
+
+.inputControl:hover {
+  border-color: var(--text-secondary);
+}
+
+.inputControl:focus {
+  border-color: var(--accent-copper);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.quickAddInput {
+  padding-left: 2.25rem;
+  background-color: var(--bg-surface);
+}
+
+.tenantEmptyState {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--bg-ground);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.emptyStateIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-copper-tint);
+  color: var(--accent-copper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyStateTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emptyStateDesc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 28rem;
+}
+
+.tenantRoster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tenantRosterFooter {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.btnAddTenantWide {
+  width: 100%;
+  height: 2.5rem;
+  border-style: dashed;
+  border-color: var(--border-strong);
+  background-color: var(--bg-ground);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btnAddTenantWide:hover:not(:disabled) {
+  background-color: var(--accent-copper-tint);
+  border-color: var(--accent-copper);
+  color: var(--accent-copper);
+}
+
+@media (max-width: 600px) {
+  .tenantQuickAddForm {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .tenantQuickAddForm .btn {
+    width: 100%;
+    height: 2.5rem;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.625rem;
+  }
+
+  .sectionHeader .btn {
+    width: 100%;
+    height: 2.5rem;
+  }
+
+  .workspacePanel {
+    padding: 1rem 0.75rem;
+    border-radius: var(--radius-sm);
+  }
+}

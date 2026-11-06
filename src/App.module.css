@@ -1,0 +1,40 @@
+/* Main Two-Column Workbench */
+.workbenchLayout {
+  display: grid;
+  grid-template-columns: 18.5rem minmax(0, 1fr);
+  min-height: calc(100vh - 4.25rem);
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Main Workspace */
+.mainWorkspace {
+  padding: 1.5rem 2rem 2.5rem 2rem;
+  max-width: 74rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (max-width: 860px) {
+  .workbenchLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mainWorkspace {
+    padding: 1.25rem 1rem 2rem 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 600px) {
+  .mainWorkspace {
+    padding: 0.875rem 0.625rem 2rem 0.625rem;
+  }
+}

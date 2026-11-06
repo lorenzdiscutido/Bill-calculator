@@ -6,6 +6,7 @@ import {
   ValidationFieldErrors,
 } from '../types';
 import { TenantRow } from './TenantRow';
+import styles from './TenantRoster.module.css';
 
 export interface TenantRosterProps {
   activeRecord: BillingMonthRecord;
@@ -31,13 +32,13 @@ export function TenantRoster({
   onDeleteTenant,
 }: TenantRosterProps) {
   return (
-    <section className="workspace-panel" aria-labelledby="tenants-heading">
-      <div className="section-header">
+    <section className={styles.workspacePanel} aria-labelledby="tenants-heading">
+      <div className={styles.sectionHeader}>
         <div>
-          <h2 id="tenants-heading" className="section-heading">
+          <h2 id="tenants-heading" className={styles.sectionHeading}>
             Tenant Stays ({activeRecord.tenants.length})
           </h2>
-          <p className="section-note">
+          <p className={styles.sectionNote}>
             Tenants are variable. Add as many tenants as stayed in the unit this
             month, with inclusive dates (clipped to{' '}
             <span className="tabular">{activeRecord.periodStart}</span> –{' '}
@@ -47,7 +48,7 @@ export function TenantRoster({
         </div>
         <button
           type="button"
-          className="btn btn-primary"
+          className={`${styles.btn} ${styles.btnPrimary}`}
           onClick={onAddTenant}
         >
           <svg
@@ -69,9 +70,9 @@ export function TenantRoster({
       </div>
 
       {/* Quick Add Tenant Form */}
-      <form onSubmit={onQuickAddTenant} className="tenant-quick-add-form">
-        <div className="quick-add-input-wrap">
-          <span className="quick-add-icon" aria-hidden="true">
+      <form onSubmit={onQuickAddTenant} className={styles.tenantQuickAddForm}>
+        <div className={styles.quickAddInputWrap}>
+          <span className={styles.quickAddIcon} aria-hidden="true">
             <svg
               width="16"
               height="16"
@@ -88,13 +89,13 @@ export function TenantRoster({
           </span>
           <input
             type="text"
-            className="input-control quick-add-input"
+            className={`${styles.inputControl} ${styles.quickAddInput}`}
             placeholder="Enter tenant name (e.g. Juan Dela Cruz) and press Enter to add..."
             value={quickTenantName}
             onChange={(e) => onQuickTenantNameChange(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn btn-secondary">
+        <button type="submit" className={`${styles.btn} ${styles.btnSecondary}`}>
           <svg
             width="14"
             height="14"
@@ -114,8 +115,8 @@ export function TenantRoster({
       </form>
 
       {activeRecord.tenants.length === 0 ? (
-        <div className="tenant-empty-state">
-          <div className="empty-state-icon" aria-hidden="true">
+        <div className={styles.tenantEmptyState}>
+          <div className={styles.emptyStateIcon} aria-hidden="true">
             <svg
               width="24"
               height="24"
@@ -132,16 +133,16 @@ export function TenantRoster({
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
-          <h3 className="empty-state-title">
+          <h3 className={styles.emptyStateTitle}>
             No tenants in this billing month yet
           </h3>
-          <p className="empty-state-desc">
+          <p className={styles.emptyStateDesc}>
             Tenant occupancy is variable each month. Click the button below or
             enter a name above to add tenants who stayed in the unit.
           </p>
           <button
             type="button"
-            className="btn btn-primary"
+            className={`${styles.btn} ${styles.btnPrimary}`}
             onClick={onAddTenant}
           >
             <svg
@@ -163,7 +164,7 @@ export function TenantRoster({
         </div>
       ) : (
         <>
-          <div className="tenant-roster">
+          <div className={styles.tenantRoster}>
             {activeRecord.tenants.map((tenant, index) => (
               <TenantRow
                 key={tenant.id}
@@ -176,10 +177,10 @@ export function TenantRoster({
             ))}
           </div>
 
-          <div className="tenant-roster-footer">
+          <div className={styles.tenantRosterFooter}>
             <button
               type="button"
-              className="btn btn-secondary btn-add-tenant-wide"
+              className={`${styles.btn} ${styles.btnSecondary} ${styles.btnAddTenantWide}`}
               onClick={onAddTenant}
             >
               <svg

@@ -1,0 +1,72 @@
+.topbarBtnGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4375rem;
+  height: 2.375rem;
+  padding: 0 0.875rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background-color: var(--accent-copper);
+  color: #ffffff;
+  border-color: var(--accent-copper);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background-color: var(--accent-copper-hover);
+  border-color: var(--accent-copper-hover);
+}
+
+.btnShell {
+  background-color: var(--bg-shell-elevated);
+  color: var(--text-on-shell);
+  border-color: var(--border-shell);
+}
+
+.btnShell:hover:not(:disabled) {
+  background-color: var(--bg-shell-hover);
+}
+
+@media (max-width: 768px) {
+  .topbarBtnGroup {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .topbarBtnGroup .btn {
+    width: 100%;
+    height: 2.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbarBtnGroup {
+    grid-template-columns: 1fr;
+  }
+
+  .resultsHeaderBtn {
+    width: 100%;
+    height: 2.5rem;
+  }
+}

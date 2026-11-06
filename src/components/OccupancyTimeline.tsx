@@ -1,5 +1,6 @@
 import { parseIsoDateToUtcMs } from '../calculator';
 import { TenantCalculationResult } from '../types';
+import styles from './OccupancyTimeline.module.css';
 
 export interface OccupancyTimelineProps {
   periodStart: string;
@@ -58,8 +59,8 @@ export function OccupancyTimeline({
   tenantResults,
 }: OccupancyTimelineProps) {
   return (
-    <div className="occupancy-strip-container">
-      <div className="occupancy-strip-header">
+    <div className={styles.occupancyStripContainer}>
+      <div className={styles.occupancyStripHeader}>
         <span>
           <strong>Billing Period Occupancy Schedule:</strong>{' '}
           <span className="tabular">{periodStart}</span> to{' '}
@@ -71,9 +72,9 @@ export function OccupancyTimeline({
         </span>
       </div>
 
-      <div className="occupancy-ruler" aria-hidden="true">
+      <div className={styles.occupancyRuler} aria-hidden="true">
         <span>Tenant</span>
-        <div className="ruler-ticks">
+        <div className={styles.rulerTicks}>
           <span>Day 1</span>
           <span>Day {Math.ceil(billingPeriodDays / 2)}</span>
           <span>Day {billingPeriodDays}</span>
@@ -81,7 +82,7 @@ export function OccupancyTimeline({
         <span style={{ textAlign: 'right' }}>Stay</span>
       </div>
 
-      <div className="occupancy-tracks">
+      <div className={styles.occupancyTracks}>
         {tenantResults.map((tCalc) => {
           const barStyle = computeOccupancyBarStyle(
             tCalc,
@@ -89,23 +90,25 @@ export function OccupancyTimeline({
             billingPeriodDays
           );
           return (
-            <div key={tCalc.tenantId} className="occupancy-track-row">
+            <div key={tCalc.tenantId} className={styles.occupancyTrackRow}>
               <span
-                className="occupancy-tenant-name"
+                className={styles.occupancyTenantName}
                 title={tCalc.name}
               >
                 {tCalc.name}
               </span>
-              <div className="occupancy-bar-bed">
+              <div className={styles.occupancyBarBed}>
                 <div
-                  className={`occupancy-bar-fill ${
-                    tCalc.mode === 'manual' ? 'is-manual' : ''
+                  className={`${styles.occupancyBarFill} ${
+                    tCalc.mode === 'manual' ? styles.isManual : ''
                   }`}
                   style={barStyle}
                   title={`${tCalc.name}: ${tCalc.daysStayed} days`}
                 />
               </div>
-              <span className="occupancy-day-count">{tCalc.daysStayed}d</span>
+              <span className={styles.occupancyDayCount}>
+                {tCalc.daysStayed}d
+              </span>
             </div>
           );
         })}

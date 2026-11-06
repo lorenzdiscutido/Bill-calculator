@@ -1,4 +1,5 @@
 import { ActionPanel } from './ActionPanel';
+import styles from './TopBar.module.css';
 
 export interface TopBarProps {
   unitName: string;
@@ -20,9 +21,9 @@ export function TopBar({
   onExportCombined,
 }: TopBarProps) {
   return (
-    <header className="topbar">
-      <div className="topbar-brand">
-        <span className="topbar-badge" aria-hidden="true">
+    <header className={styles.topbar}>
+      <div className={styles.topbarBrand}>
+        <span className={styles.topbarBadge} aria-hidden="true">
           <svg
             width="18"
             height="18"
@@ -37,22 +38,22 @@ export function TopBar({
           </svg>
         </span>
         <div>
-          <h1 className="topbar-title">Monthly Electricity Bill Splitter</h1>
-          <p className="topbar-subtitle">
+          <h1 className={styles.topbarTitle}>Monthly Electricity Bill Splitter</h1>
+          <p className={styles.topbarSubtitle}>
             Single-meter apartment proration by tenant stay days (₱)
           </p>
         </div>
       </div>
 
-      <div className="topbar-controls">
-        <div className="unit-setting-field">
-          <label htmlFor="unit-name-input" className="unit-setting-label">
+      <div className={styles.topbarControls}>
+        <div className={styles.unitSettingField}>
+          <label htmlFor="unit-name-input" className={styles.unitSettingLabel}>
             Unit Label (PDF):
           </label>
           <input
             id="unit-name-input"
             type="text"
-            className="unit-setting-input"
+            className={styles.unitSettingInput}
             value={unitName}
             onChange={(e) => onUnitNameChange(e.target.value)}
             placeholder="e.g. Unit 4B — Sampaguita Residences"
@@ -60,7 +61,7 @@ export function TopBar({
         </div>
 
         {saveToast && (
-          <span className="save-feedback-toast" role="status">
+          <span className={styles.saveFeedbackToast} role="status">
             {saveToast}
           </span>
         )}

@@ -1,5 +1,6 @@
 import { formatCentavos, MONTH_NAMES, parsePesosToCentavos } from '../calculator';
 import { BillingMonthRecord } from '../types';
+import styles from './ArchiveRail.module.css';
 
 export interface ArchiveRailProps {
   savedMonths: BillingMonthRecord[];
@@ -25,27 +26,27 @@ export function ArchiveRail({
   onRestoreSampleData,
 }: ArchiveRailProps) {
   return (
-    <aside className="archive-rail" aria-label="Billing Month History">
-      <div className="rail-header">
+    <aside className={styles.archiveRail} aria-label="Billing Month History">
+      <div className={styles.railHeader}>
         <div>
-          <h2 className="rail-heading">
+          <h2 className={styles.railHeading}>
             Saved Billing Months ({savedMonths.length})
           </h2>
-          <span className="rail-active-indicator">
+          <span className={styles.railActiveIndicator}>
             Current: {activeMonthTitle}
           </span>
         </div>
-        <div className="rail-header-btns">
+        <div className={styles.railHeaderBtns}>
           <button
             type="button"
-            className="btn-ghost-sm"
+            className={styles.btnGhostSm}
             onClick={onCreateNewMonth}
           >
             + New Month
           </button>
           <button
             type="button"
-            className="btn-ghost-sm mobile-history-toggle"
+            className={`${styles.btnGhostSm} ${styles.mobileHistoryToggle}`}
             onClick={onToggleMobileArchive}
             aria-expanded={mobileArchiveOpen}
           >
@@ -55,11 +56,11 @@ export function ArchiveRail({
       </div>
 
       <div
-        className={`archive-collapsible-content ${
-          mobileArchiveOpen ? 'is-open' : ''
+        className={`${styles.archiveCollapsibleContent} ${
+          mobileArchiveOpen ? styles.isOpen : ''
         }`}
       >
-        <ul className="archive-list">
+        <ul className={styles.archiveList}>
           {savedMonths.map((item) => {
             const parsedBill = parsePesosToCentavos(item.billAmountInput);
             const formattedBill =
@@ -72,18 +73,22 @@ export function ArchiveRail({
             return (
               <li
                 key={item.id}
-                className={`archive-item ${isSelected ? 'is-active' : ''}`}
+                className={`${styles.archiveItem} ${
+                  isSelected ? styles.isActive : ''
+                }`}
               >
                 <button
                   type="button"
-                  className="archive-select-btn"
+                  className={styles.archiveSelectBtn}
                   onClick={() => onSelectMonth(item.id)}
                 >
-                  <div className="archive-item-top">
-                    <span className="archive-month-name">{label}</span>
-                    <span className="archive-bill-amount">{formattedBill}</span>
+                  <div className={styles.archiveItemTop}>
+                    <span className={styles.archiveMonthName}>{label}</span>
+                    <span className={styles.archiveBillAmount}>
+                      {formattedBill}
+                    </span>
                   </div>
-                  <div className="archive-item-meta">
+                  <div className={styles.archiveItemMeta}>
                     <span>
                       {item.tenants.length}{' '}
                       {item.tenants.length === 1 ? 'tenant' : 'tenants'}
@@ -95,7 +100,7 @@ export function ArchiveRail({
                 </button>
                 <button
                   type="button"
-                  className="archive-delete-btn"
+                  className={styles.archiveDeleteBtn}
                   onClick={() => onDeleteMonth(item.id)}
                   aria-label={`Delete ${label}`}
                   title={`Delete ${label}`}
@@ -120,10 +125,10 @@ export function ArchiveRail({
           })}
         </ul>
 
-        <div className="rail-footer">
+        <div className={styles.railFooter}>
           <button
             type="button"
-            className="btn btn-secondary btn-full-width"
+            className={`${styles.btn} ${styles.btnSecondary} ${styles.btnFullWidth}`}
             onClick={onRestoreSampleData}
           >
             Load Sample Dataset (3 Tenants)
