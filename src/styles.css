@@ -40,17 +40,17 @@
 
 :root {
   --bg-ground: #f5f3ee;
-  --bg-ground-subtle: #ebe7df;
+  --bg-ground-subtle: #eae6de;
   --bg-surface: #ffffff;
-  --bg-surface-hover: #faf9f6;
+  --bg-surface-hover: #fcfbf9;
   --bg-surface-active: #fdf6f0;
   --bg-shell: #161b22;
   --bg-shell-elevated: #212832;
   --bg-shell-hover: #2b3441;
 
   --text-primary: #161b22;
-  --text-secondary: #3f4854;
-  --text-placeholder: #586270;
+  --text-secondary: #4a5568;
+  --text-placeholder: #718096;
   --text-on-shell: #f5f3ee;
   --text-on-shell-muted: #c2cad4;
 
@@ -71,18 +71,25 @@
   --state-warning-bg: #fef6eb;
   --state-warning-border: #e8c597;
 
-  --border-hairline: #d4dae1;
-  --border-strong: #adb6c2;
-  --border-shell: #323c4a;
+  --border-hairline: #e2e7ec;
+  --border-strong: #cbd5e1;
+  --border-shell: #2d3748;
 
-  --shadow-panel: 0 2px 6px rgba(22, 27, 34, 0.06);
-  --shadow-focus: 0 2px 8px rgba(184, 77, 17, 0.14);
+  --shadow-xs: 0 1px 2px 0 rgba(22, 27, 34, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(22, 27, 34, 0.06), 0 1px 2px -1px rgba(22, 27, 34, 0.04);
+  --shadow-panel: 0 2px 8px -2px rgba(22, 27, 34, 0.06), 0 1px 4px -1px rgba(22, 27, 34, 0.04);
+  --shadow-hover: 0 6px 16px -2px rgba(22, 27, 34, 0.08), 0 2px 6px -1px rgba(22, 27, 34, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(184, 77, 17, 0.18);
+  --shadow-focus-error: 0 0 0 3px rgba(168, 31, 21, 0.18);
 
-  --font-sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
 }
 
 *,
@@ -108,6 +115,7 @@ body,
   line-height: 1.5;
   caret-color: var(--accent-copper);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -117,6 +125,11 @@ body,
 a {
   color: var(--accent-copper);
   text-underline-offset: 0.2em;
+  transition: color 150ms ease-out;
+}
+
+a:hover {
+  color: var(--accent-copper-hover);
 }
 
 button,

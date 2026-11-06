@@ -65,7 +65,7 @@ export function TenantRoster({
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          + Add Tenant
+          Add Tenant
         </button>
       </div>
 
@@ -159,7 +159,7 @@ export function TenantRoster({
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            + Add First Tenant
+            Add First Tenant
           </button>
         </div>
       ) : (
@@ -197,7 +197,7 @@ export function TenantRoster({
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              + Add Another Tenant
+              Add Another Tenant
             </button>
           </div>
         </>

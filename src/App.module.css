@@ -15,12 +15,14 @@
   padding: 1.5rem 2rem 2.5rem 2rem;
   max-width: 74rem;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .workbenchLayout {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -33,8 +35,9 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .mainWorkspace {
     padding: 0.875rem 0.625rem 2rem 0.625rem;
+    gap: 1.125rem;
   }
 }

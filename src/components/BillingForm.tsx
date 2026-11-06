@@ -134,7 +134,11 @@ export function BillingForm({
         <div className={`${styles.fieldGroup} ${styles.fieldGroupPeriod}`}>
           <div className={styles.fieldLabelRow}>
             <span className={styles.fieldLabel}>Billing Period Dates</span>
-            <span className={styles.fieldHint}>
+            <span
+              className={`${styles.periodDurationBadge} ${
+                billingPeriodDays <= 0 ? styles.periodInvalidBadge : ''
+              }`}
+            >
               {billingPeriodDays > 0
                 ? `${billingPeriodDays} days`
                 : 'Invalid range'}
