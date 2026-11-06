@@ -673,34 +673,40 @@ export default function App() {
                   </span>
                 </div>
                 <div className="date-pair-grid">
-                  <input
-                    type="date"
-                    aria-label="Billing Period Start Date"
-                    className={`input-control tabular ${
-                      splitResult.fieldErrors.periodDates ? 'is-invalid' : ''
-                    }`}
-                    value={activeRecord.periodStart}
-                    onChange={(e) =>
-                      updateActiveRecord((prev) => ({
-                        ...prev,
-                        periodStart: e.target.value,
-                      }))
-                    }
-                  />
-                  <input
-                    type="date"
-                    aria-label="Billing Period End Date"
-                    className={`input-control tabular ${
-                      splitResult.fieldErrors.periodDates ? 'is-invalid' : ''
-                    }`}
-                    value={activeRecord.periodEnd}
-                    onChange={(e) =>
-                      updateActiveRecord((prev) => ({
-                        ...prev,
-                        periodEnd: e.target.value,
-                      }))
-                    }
-                  />
+                  <div className="date-input-wrap">
+                    <span className="date-input-label">Start Date</span>
+                    <input
+                      type="date"
+                      aria-label="Billing Period Start Date"
+                      className={`input-control tabular ${
+                        splitResult.fieldErrors.periodDates ? 'is-invalid' : ''
+                      }`}
+                      value={activeRecord.periodStart}
+                      onChange={(e) =>
+                        updateActiveRecord((prev) => ({
+                          ...prev,
+                          periodStart: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="date-input-wrap">
+                    <span className="date-input-label">End Date</span>
+                    <input
+                      type="date"
+                      aria-label="Billing Period End Date"
+                      className={`input-control tabular ${
+                        splitResult.fieldErrors.periodDates ? 'is-invalid' : ''
+                      }`}
+                      value={activeRecord.periodEnd}
+                      onChange={(e) =>
+                        updateActiveRecord((prev) => ({
+                          ...prev,
+                          periodEnd: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </div>
                 {splitResult.fieldErrors.periodDates && (
                   <p className="field-error-text" role="alert">
@@ -921,32 +927,38 @@ export default function App() {
                             </span>
                           </div>
                           <div className="date-pair-grid">
-                            <input
-                              type="date"
-                              aria-label={`Start date for ${tenant.name}`}
-                              className={`input-control tabular ${
-                                rowError ? 'is-invalid' : ''
-                              }`}
-                              value={tenant.startDate}
-                              onChange={(e) =>
-                                handleUpdateTenant(tenant.id, {
-                                  startDate: e.target.value,
-                                })
-                              }
-                            />
-                            <input
-                              type="date"
-                              aria-label={`End date for ${tenant.name}`}
-                              className={`input-control tabular ${
-                                rowError ? 'is-invalid' : ''
-                              }`}
-                              value={tenant.endDate}
-                              onChange={(e) =>
-                                handleUpdateTenant(tenant.id, {
-                                  endDate: e.target.value,
-                                })
-                              }
-                            />
+                            <div className="date-input-wrap">
+                              <span className="date-input-label">Check-in</span>
+                              <input
+                                type="date"
+                                aria-label={`Start date for ${tenant.name}`}
+                                className={`input-control tabular ${
+                                  rowError ? 'is-invalid' : ''
+                                }`}
+                                value={tenant.startDate}
+                                onChange={(e) =>
+                                  handleUpdateTenant(tenant.id, {
+                                    startDate: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="date-input-wrap">
+                              <span className="date-input-label">Check-out</span>
+                              <input
+                                type="date"
+                                aria-label={`End date for ${tenant.name}`}
+                                className={`input-control tabular ${
+                                  rowError ? 'is-invalid' : ''
+                                }`}
+                                value={tenant.endDate}
+                                onChange={(e) =>
+                                  handleUpdateTenant(tenant.id, {
+                                    endDate: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
                       ) : (
