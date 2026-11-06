@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   calculateBillSplit,
   formatCentavos,
@@ -37,6 +37,7 @@ export default function App() {
   });
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [exportingId, setExportingId] = useState<string | null>(null);
+  const [quickTenantName, setQuickTenantName] = useState<string>('');
 
   const activeRecord = useMemo(() => {
     return (
@@ -139,19 +140,32 @@ export default function App() {
     }));
   }
 
-  function handleAddTenant() {
+  function handleAddTenant(nameOverride?: string) {
+    const chosenName =
+      typeof nameOverride === 'string' && nameOverride.trim()
+        ? nameOverride.trim()
+        : `Tenant ${activeRecord.tenants.length + 1}`;
+
     const newTenant: TenantStayInput = {
       id: createId('tenant'),
-      name: `Tenant ${activeRecord.tenants.length + 1}`,
+      name: chosenName,
       mode: 'dates',
       startDate: activeRecord.periodStart,
       endDate: activeRecord.periodEnd,
-      manualDays: String(splitResult.billingPeriodDays || defaultMonthBounds.daysInMonth),
+      manualDays: String(
+        splitResult.billingPeriodDays || defaultMonthBounds.daysInMonth
+      ),
     };
     updateActiveRecord((prev) => ({
       ...prev,
       tenants: [...prev.tenants, newTenant],
     }));
+  }
+
+  function handleQuickAddTenant(e: FormEvent) {
+    e.preventDefault();
+    handleAddTenant(quickTenantName);
+    setQuickTenantName('');
   }
 
   function handleUpdateTenant(
@@ -680,22 +694,127 @@ export default function App() {
                   Tenant Stays ({activeRecord.tenants.length})
                 </h2>
                 <p className="section-note">
-                  Record inclusive stay dates (automatically clipped to{' '}
+                  Tenants are variable. Add as many tenants as stayed in the unit this month, with inclusive dates (clipped to{' '}
                   <span className="tabular">{activeRecord.periodStart}</span> –{' '}
-                  <span className="tabular">{activeRecord.periodEnd}</span>) or
-                  enter manual days stayed. One calendar day equals one stay day.
+                  <span className="tabular">{activeRecord.periodEnd}</span>) or manual day counts.
                 </p>
               </div>
               <button
                 type="button"
-                className="btn btn-secondary"
-                onClick={handleAddTenant}
+                className="btn btn-primary"
+                onClick={() => handleAddTenant()}
               >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
                 + Add Tenant
               </button>
             </div>
 
-            <div className="tenant-roster">
+            {/* Quick Add Tenant Form */}
+            <form onSubmit={handleQuickAddTenant} className="tenant-quick-add-form">
+              <div className="quick-add-input-wrap">
+                <span className="quick-add-icon" aria-hidden="true">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  className="input-control quick-add-input"
+                  placeholder="Enter tenant name (e.g. Juan Dela Cruz) and press Enter to add..."
+                  value={quickTenantName}
+                  onChange={(e) => setQuickTenantName(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn btn-secondary">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Add Tenant
+              </button>
+            </form>
+
+            {activeRecord.tenants.length === 0 ? (
+              <div className="tenant-empty-state">
+                <div className="empty-state-icon" aria-hidden="true">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </div>
+                <h3 className="empty-state-title">No tenants in this billing month yet</h3>
+                <p className="empty-state-desc">
+                  Tenant occupancy is variable each month. Click the button below or enter a name above to add tenants who stayed in the unit.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => handleAddTenant()}
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  + Add First Tenant
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="tenant-roster">
               {activeRecord.tenants.map((tenant, index) => {
                 const tCalc = splitResult.tenantResults[index];
                 const rowError = splitResult.fieldErrors.byTenantId[tenant.id];
@@ -890,7 +1009,33 @@ export default function App() {
                 );
               })}
             </div>
-          </section>
+
+            <div className="tenant-roster-footer">
+              <button
+                type="button"
+                className="btn btn-secondary btn-add-tenant-wide"
+                onClick={() => handleAddTenant()}
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                + Add Another Tenant
+              </button>
+            </div>
+          </>
+        )}
+      </section>
 
           {/* 3. Calculation & Split Output */}
           <section className="workspace-panel" aria-labelledby="results-heading">
