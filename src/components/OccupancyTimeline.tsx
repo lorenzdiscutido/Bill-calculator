@@ -103,6 +103,11 @@ export function OccupancyTimeline({
                     tCalc.mode === 'manual' ? styles.isManual : ''
                   }`}
                   style={barStyle}
+                  role="progressbar"
+                  aria-valuenow={tCalc.daysStayed}
+                  aria-valuemin={0}
+                  aria-valuemax={billingPeriodDays}
+                  aria-label={`${tCalc.name}: ${tCalc.daysStayed} of ${billingPeriodDays} days occupied`}
                   title={`${tCalc.name}: ${tCalc.daysStayed} days`}
                 />
               </div>

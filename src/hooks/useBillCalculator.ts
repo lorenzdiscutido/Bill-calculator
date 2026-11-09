@@ -4,7 +4,6 @@ import {
   getDefaultMonthPeriod,
   MONTH_NAMES,
 } from '../calculator';
-import { exportCombinedBillPdf, exportSingleTenantPdf } from '../pdfExport';
 import { createSampleBillingMonth, DEFAULT_UNIT_NAME } from '../sampleData';
 import {
   loadActiveMonthId,
@@ -82,11 +81,17 @@ export function useBillCalculator(): UseBillCalculatorReturn {
   }, [savedMonths, activeMonthId]);
 
   useEffect(() => {
-    saveUnitName(unitName);
+    const timer = window.setTimeout(() => {
+      saveUnitName(unitName);
+    }, 250);
+    return () => window.clearTimeout(timer);
   }, [unitName]);
 
   useEffect(() => {
-    saveMonthsList(savedMonths);
+    const timer = window.setTimeout(() => {
+      saveMonthsList(savedMonths);
+    }, 250);
+    return () => window.clearTimeout(timer);
   }, [savedMonths]);
 
   useEffect(() => {
@@ -341,6 +346,7 @@ export function useBillCalculator(): UseBillCalculatorReturn {
     if (!splitResult.isValid) return;
     setExportingId('combined');
     try {
+      const { exportCombinedBillPdf } = await import('../pdfExport');
       await exportCombinedBillPdf(activeRecord, splitResult, unitName);
     } finally {
       setExportingId(null);
@@ -355,6 +361,7 @@ export function useBillCalculator(): UseBillCalculatorReturn {
     if (!tenantCalc) return;
     setExportingId(tenantId);
     try {
+      const { exportSingleTenantPdf } = await import('../pdfExport');
       await exportSingleTenantPdf(
         activeRecord,
         splitResult,
