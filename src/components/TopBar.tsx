@@ -2,24 +2,23 @@ import { ActionPanel } from './ActionPanel';
 import styles from './TopBar.module.css';
 
 export interface TopBarProps {
-  unitName: string;
-  onUnitNameChange: (value: string) => void;
-  saveToast: string | null;
-  isValid: boolean;
-  exportingId: string | null;
-  onSaveMonth: () => void;
-  onExportCombined: () => void;
+  state: {
+    unitName: string;
+    saveToast: string | null;
+    splitResult: { isValid: boolean };
+    exportingId: string | null;
+  };
+  actions: {
+    setUnitName: (value: string) => void;
+    manualSaveConfirm: () => void;
+    exportCombined: () => Promise<void> | void;
+  };
 }
 
-export function TopBar({
-  unitName,
-  onUnitNameChange,
-  saveToast,
-  isValid,
-  exportingId,
-  onSaveMonth,
-  onExportCombined,
-}: TopBarProps) {
+export function TopBar({ state, actions }: TopBarProps) {
+  const { unitName, saveToast, splitResult, exportingId } = state;
+  const { setUnitName, manualSaveConfirm, exportCombined } = actions;
+
   return (
     <header className={styles.topbar}>
       <div className={styles.topbarBrand}>
@@ -55,7 +54,7 @@ export function TopBar({
             type="text"
             className={styles.unitSettingInput}
             value={unitName}
-            onChange={(e) => onUnitNameChange(e.target.value)}
+            onChange={(e) => setUnitName(e.target.value)}
             placeholder="e.g. Unit 4B — Sampaguita Residences"
           />
         </div>
@@ -68,10 +67,10 @@ export function TopBar({
 
         <ActionPanel
           variant="topbar"
-          isValid={isValid}
+          isValid={splitResult.isValid}
           exportingId={exportingId}
-          onSaveMonth={onSaveMonth}
-          onExportCombined={onExportCombined}
+          onSaveMonth={manualSaveConfirm}
+          onExportCombined={exportCombined}
         />
       </div>
     </header>

@@ -1,6 +1,7 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   calculateBillSplit,
+  countInclusiveDays,
   getDefaultMonthPeriod,
   MONTH_NAMES,
 } from '../calculator';
@@ -19,9 +20,8 @@ function createId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export interface UseBillCalculatorReturn {
+export interface BillCalculatorState {
   unitName: string;
-  setUnitName: (value: string) => void;
   savedMonths: BillingMonthRecord[];
   activeRecord: BillingMonthRecord;
   activeMonthTitle: string;
@@ -31,28 +31,34 @@ export interface UseBillCalculatorReturn {
   saveToast: string | null;
   exportingId: string | null;
   quickTenantName: string;
-  setQuickTenantName: (value: string) => void;
   mobileArchiveOpen: boolean;
-  handleToggleMobileArchive: () => void;
-  handleSelectMonth: (monthId: string) => void;
-  handleMonthOrYearChange: (newMonth: number, newYear: number) => void;
-  handleBillAmountChange: (billAmountInput: string) => void;
-  handlePeriodStartChange: (periodStart: string) => void;
-  handlePeriodEndChange: (periodEnd: string) => void;
-  handleResetPeriodToFullMonth: () => void;
-  handleAddTenant: (nameOverride?: string) => void;
-  handleQuickAddTenant: (e: FormEvent) => void;
-  handleUpdateTenant: (
-    tenantId: string,
-    patch: Partial<TenantStayInput>
-  ) => void;
-  handleDeleteTenant: (tenantId: string) => void;
-  handleCreateNewMonth: () => void;
-  handleDeleteMonth: (monthId: string) => void;
-  handleRestoreSampleData: () => void;
-  handleManualSaveConfirm: () => void;
-  handleExportCombined: () => Promise<void>;
-  handleExportSingle: (tenantId: string) => Promise<void>;
+}
+
+export interface BillCalculatorActions {
+  setUnitName: (value: string) => void;
+  setQuickTenantName: (value: string) => void;
+  toggleMobileArchive: () => void;
+  selectMonth: (monthId: string) => void;
+  changeMonthOrYear: (newMonth: number, newYear: number) => void;
+  changeBillAmount: (billAmountInput: string) => void;
+  changePeriodStart: (periodStart: string) => void;
+  changePeriodEnd: (periodEnd: string) => void;
+  resetPeriodToFullMonth: () => void;
+  addTenant: (nameOverride?: string) => void;
+  quickAddTenant: (e: FormEvent) => void;
+  updateTenant: (tenantId: string, patch: Partial<TenantStayInput>) => void;
+  deleteTenant: (tenantId: string) => void;
+  createNewMonth: () => void;
+  deleteMonth: (monthId: string) => void;
+  restoreSampleData: () => void;
+  manualSaveConfirm: () => void;
+  exportCombined: () => Promise<void>;
+  exportSingle: (tenantId: string) => Promise<void>;
+}
+
+export interface UseBillCalculatorReturn {
+  state: BillCalculatorState;
+  actions: BillCalculatorActions;
 }
 
 export function useBillCalculator(): UseBillCalculatorReturn {
@@ -114,203 +120,238 @@ export function useBillCalculator(): UseBillCalculatorReturn {
     activeRecord.periodStart !== defaultMonthBounds.start ||
     activeRecord.periodEnd !== defaultMonthBounds.end;
 
-  function updateActiveRecord(
-    updater: (prev: BillingMonthRecord) => BillingMonthRecord
-  ) {
-    setSavedMonths((prevList) =>
-      prevList.map((item) =>
-        item.id === activeRecord.id
-          ? { ...updater(item), updatedAt: new Date().toISOString() }
-          : item
-      )
-    );
-  }
+  const updateActiveRecord = useCallback(
+    (updater: (prev: BillingMonthRecord) => BillingMonthRecord) => {
+      setSavedMonths((prevList) =>
+        prevList.map((item) =>
+          item.id === activeMonthId
+            ? { ...updater(item), updatedAt: new Date().toISOString() }
+            : item
+        )
+      );
+    },
+    [activeMonthId]
+  );
 
-  function triggerToast(msg: string) {
+  const triggerToast = useCallback((msg: string) => {
     setSaveToast(msg);
     window.setTimeout(() => {
       setSaveToast((curr) => (curr === msg ? null : curr));
     }, 2400);
-  }
+  }, []);
 
-  function handleToggleMobileArchive() {
+  const handleToggleMobileArchive = useCallback(() => {
     setMobileArchiveOpen((prev) => !prev);
-  }
+  }, []);
 
-  function handleSelectMonth(monthId: string) {
+  const handleSelectMonth = useCallback((monthId: string) => {
     setActiveMonthId(monthId);
     setMobileArchiveOpen(false);
-  }
+  }, []);
 
-  function handleMonthOrYearChange(newMonth: number, newYear: number) {
-    const validYear = Math.max(2000, Math.min(2100, newYear || 2026));
-    const oldDefault = getDefaultMonthPeriod(
-      activeRecord.year,
-      activeRecord.month
-    );
-    const newDefault = getDefaultMonthPeriod(validYear, newMonth);
+  const handleMonthOrYearChange = useCallback(
+    (newMonth: number, newYear: number) => {
+      const validYear = Math.max(2000, Math.min(2100, newYear || 2026));
 
-    updateActiveRecord((prev) => {
-      const wasUsingDefault =
-        prev.periodStart === oldDefault.start &&
-        prev.periodEnd === oldDefault.end;
+      updateActiveRecord((prev) => {
+        const oldDefault = getDefaultMonthPeriod(prev.year, prev.month);
+        const newDefault = getDefaultMonthPeriod(validYear, newMonth);
 
-      const nextPeriodStart = wasUsingDefault
-        ? newDefault.start
-        : prev.periodStart;
-      const nextPeriodEnd = wasUsingDefault ? newDefault.end : prev.periodEnd;
+        const wasUsingDefault =
+          prev.periodStart === oldDefault.start &&
+          prev.periodEnd === oldDefault.end;
 
-      const updatedTenants = prev.tenants.map((t) => {
-        if (
-          t.mode === 'dates' &&
-          t.startDate === oldDefault.start &&
-          t.endDate === oldDefault.end
-        ) {
-          return {
-            ...t,
-            startDate: newDefault.start,
-            endDate: newDefault.end,
-            manualDays: String(newDefault.daysInMonth),
-          };
-        }
-        return t;
+        const nextPeriodStart = wasUsingDefault
+          ? newDefault.start
+          : prev.periodStart;
+        const nextPeriodEnd = wasUsingDefault ? newDefault.end : prev.periodEnd;
+
+        const updatedTenants = prev.tenants.map((t) => {
+          if (
+            t.mode === 'dates' &&
+            t.startDate === oldDefault.start &&
+            t.endDate === oldDefault.end
+          ) {
+            return {
+              ...t,
+              startDate: newDefault.start,
+              endDate: newDefault.end,
+              manualDays: String(newDefault.daysInMonth),
+            };
+          }
+          return t;
+        });
+
+        return {
+          ...prev,
+          month: newMonth,
+          year: validYear,
+          periodStart: nextPeriodStart,
+          periodEnd: nextPeriodEnd,
+          tenants: updatedTenants,
+        };
       });
+    },
+    [updateActiveRecord]
+  );
 
+  const handleBillAmountChange = useCallback(
+    (billAmountInput: string) => {
+      updateActiveRecord((prev) => ({
+        ...prev,
+        billAmountInput,
+      }));
+    },
+    [updateActiveRecord]
+  );
+
+  const handlePeriodStartChange = useCallback(
+    (periodStart: string) => {
+      updateActiveRecord((prev) => ({
+        ...prev,
+        periodStart,
+      }));
+    },
+    [updateActiveRecord]
+  );
+
+  const handlePeriodEndChange = useCallback(
+    (periodEnd: string) => {
+      updateActiveRecord((prev) => ({
+        ...prev,
+        periodEnd,
+      }));
+    },
+    [updateActiveRecord]
+  );
+
+  const handleResetPeriodToFullMonth = useCallback(() => {
+    updateActiveRecord((prev) => {
+      const defaultBounds = getDefaultMonthPeriod(prev.year, prev.month);
       return {
         ...prev,
-        month: newMonth,
-        year: validYear,
-        periodStart: nextPeriodStart,
-        periodEnd: nextPeriodEnd,
-        tenants: updatedTenants,
+        periodStart: defaultBounds.start,
+        periodEnd: defaultBounds.end,
       };
     });
-  }
+  }, [updateActiveRecord]);
 
-  function handleBillAmountChange(billAmountInput: string) {
-    updateActiveRecord((prev) => ({
-      ...prev,
-      billAmountInput,
-    }));
-  }
+  const handleAddTenant = useCallback(
+    (nameOverride?: string) => {
+      updateActiveRecord((prev) => {
+        const chosenName =
+          typeof nameOverride === 'string' && nameOverride.trim()
+            ? nameOverride.trim()
+            : `Tenant ${prev.tenants.length + 1}`;
 
-  function handlePeriodStartChange(periodStart: string) {
-    updateActiveRecord((prev) => ({
-      ...prev,
-      periodStart,
-    }));
-  }
+        const bounds = getDefaultMonthPeriod(prev.year, prev.month);
+        const days =
+          countInclusiveDays(prev.periodStart, prev.periodEnd) ||
+          bounds.daysInMonth;
 
-  function handlePeriodEndChange(periodEnd: string) {
-    updateActiveRecord((prev) => ({
-      ...prev,
-      periodEnd,
-    }));
-  }
+        const newTenant: TenantStayInput = {
+          id: createId('tenant'),
+          name: chosenName,
+          mode: 'dates',
+          startDate: prev.periodStart,
+          endDate: prev.periodEnd,
+          manualDays: String(days),
+        };
 
-  function handleResetPeriodToFullMonth() {
-    updateActiveRecord((prev) => ({
-      ...prev,
-      periodStart: defaultMonthBounds.start,
-      periodEnd: defaultMonthBounds.end,
-    }));
-  }
+        return {
+          ...prev,
+          tenants: [...prev.tenants, newTenant],
+        };
+      });
+    },
+    [updateActiveRecord]
+  );
 
-  function handleAddTenant(nameOverride?: string) {
-    const chosenName =
-      typeof nameOverride === 'string' && nameOverride.trim()
-        ? nameOverride.trim()
-        : `Tenant ${activeRecord.tenants.length + 1}`;
+  const handleQuickAddTenant = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      handleAddTenant(quickTenantName);
+      setQuickTenantName('');
+    },
+    [handleAddTenant, quickTenantName]
+  );
 
-    const newTenant: TenantStayInput = {
-      id: createId('tenant'),
-      name: chosenName,
-      mode: 'dates',
-      startDate: activeRecord.periodStart,
-      endDate: activeRecord.periodEnd,
-      manualDays: String(
-        splitResult.billingPeriodDays || defaultMonthBounds.daysInMonth
-      ),
-    };
-    updateActiveRecord((prev) => ({
-      ...prev,
-      tenants: [...prev.tenants, newTenant],
-    }));
-  }
+  const handleUpdateTenant = useCallback(
+    (tenantId: string, patch: Partial<TenantStayInput>) => {
+      updateActiveRecord((prev) => ({
+        ...prev,
+        tenants: prev.tenants.map((t) =>
+          t.id === tenantId ? { ...t, ...patch } : t
+        ),
+      }));
+    },
+    [updateActiveRecord]
+  );
 
-  function handleQuickAddTenant(e: FormEvent) {
-    e.preventDefault();
-    handleAddTenant(quickTenantName);
-    setQuickTenantName('');
-  }
+  const handleDeleteTenant = useCallback(
+    (tenantId: string) => {
+      updateActiveRecord((prev) => ({
+        ...prev,
+        tenants: prev.tenants.filter((t) => t.id !== tenantId),
+      }));
+    },
+    [updateActiveRecord]
+  );
 
-  function handleUpdateTenant(
-    tenantId: string,
-    patch: Partial<TenantStayInput>
-  ) {
-    updateActiveRecord((prev) => ({
-      ...prev,
-      tenants: prev.tenants.map((t) =>
-        t.id === tenantId ? { ...t, ...patch } : t
-      ),
-    }));
-  }
+  const handleCreateNewMonth = useCallback(() => {
+    setSavedMonths((prev) => {
+      const active =
+        prev.find((m) => m.id === activeMonthId) ??
+        prev[0] ??
+        createSampleBillingMonth();
+      const latest = prev[0] ?? active;
+      let nextMonth = latest.month + 1;
+      let nextYear = latest.year;
+      if (nextMonth > 12) {
+        nextMonth = 1;
+        nextYear += 1;
+      }
 
-  function handleDeleteTenant(tenantId: string) {
-    updateActiveRecord((prev) => ({
-      ...prev,
-      tenants: prev.tenants.filter((t) => t.id !== tenantId),
-    }));
-  }
-
-  function handleCreateNewMonth() {
-    const latest = savedMonths[0] ?? activeRecord;
-    let nextMonth = latest.month + 1;
-    let nextYear = latest.year;
-    if (nextMonth > 12) {
-      nextMonth = 1;
-      nextYear += 1;
-    }
-
-    const bounds = getDefaultMonthPeriod(nextYear, nextMonth);
-    const carriedTenants: TenantStayInput[] =
-      activeRecord.tenants.length > 0
-        ? activeRecord.tenants.map((t) => ({
-            id: createId('tenant'),
-            name: t.name,
-            mode: t.mode,
-            startDate: bounds.start,
-            endDate: bounds.end,
-            manualDays: String(bounds.daysInMonth),
-          }))
-        : [
-            {
+      const bounds = getDefaultMonthPeriod(nextYear, nextMonth);
+      const carriedTenants: TenantStayInput[] =
+        active.tenants.length > 0
+          ? active.tenants.map((t) => ({
               id: createId('tenant'),
-              name: 'Tenant 1',
-              mode: 'dates',
+              name: t.name,
+              mode: t.mode,
               startDate: bounds.start,
               endDate: bounds.end,
               manualDays: String(bounds.daysInMonth),
-            },
-          ];
+            }))
+          : [
+              {
+                id: createId('tenant'),
+                name: 'Tenant 1',
+                mode: 'dates',
+                startDate: bounds.start,
+                endDate: bounds.end,
+                manualDays: String(bounds.daysInMonth),
+              },
+            ];
 
-    const newRecord: BillingMonthRecord = {
-      id: createId('month'),
-      year: nextYear,
-      month: nextMonth,
-      billAmountInput: activeRecord.billAmountInput || '5000.00',
-      periodStart: bounds.start,
-      periodEnd: bounds.end,
-      tenants: carriedTenants,
-      updatedAt: new Date().toISOString(),
-    };
+      const newRecord: BillingMonthRecord = {
+        id: createId('month'),
+        year: nextYear,
+        month: nextMonth,
+        billAmountInput: active.billAmountInput || '5000.00',
+        periodStart: bounds.start,
+        periodEnd: bounds.end,
+        tenants: carriedTenants,
+        updatedAt: new Date().toISOString(),
+      };
 
-    setSavedMonths((prev) => [newRecord, ...prev]);
-    setActiveMonthId(newRecord.id);
-    triggerToast(`Created ${MONTH_NAMES[nextMonth - 1]} ${nextYear}`);
-  }
+      setActiveMonthId(newRecord.id);
+      triggerToast(`Created ${MONTH_NAMES[nextMonth - 1]} ${nextYear}`);
+      return [newRecord, ...prev];
+    });
+  }, [activeMonthId, triggerToast]);
 
-  function handleDeleteMonth(monthId: string) {
+  const handleDeleteMonth = useCallback((monthId: string) => {
     setSavedMonths((prev) => {
       const remaining = prev.filter((m) => m.id !== monthId);
       if (remaining.length === 0) {
@@ -318,14 +359,14 @@ export function useBillCalculator(): UseBillCalculatorReturn {
         setActiveMonthId(fallback.id);
         return [fallback];
       }
-      if (activeMonthId === monthId) {
-        setActiveMonthId(remaining[0].id);
-      }
+      setActiveMonthId((currentActiveId) =>
+        currentActiveId === monthId ? remaining[0].id : currentActiveId
+      );
       return remaining;
     });
-  }
+  }, []);
 
-  function handleRestoreSampleData() {
+  const handleRestoreSampleData = useCallback(() => {
     const sample = createSampleBillingMonth();
     setSavedMonths((prev) => {
       const withoutSample = prev.filter((m) => m.id !== sample.id);
@@ -334,15 +375,15 @@ export function useBillCalculator(): UseBillCalculatorReturn {
     setActiveMonthId(sample.id);
     setUnitName(DEFAULT_UNIT_NAME);
     triggerToast('Sample month restored');
-  }
+  }, [triggerToast]);
 
-  function handleManualSaveConfirm() {
+  const handleManualSaveConfirm = useCallback(() => {
     saveMonthsList(savedMonths);
     saveUnitName(unitName);
     triggerToast('Saved to local history');
-  }
+  }, [savedMonths, unitName, triggerToast]);
 
-  async function handleExportCombined() {
+  const handleExportCombined = useCallback(async () => {
     if (!splitResult.isValid) return;
     setExportingId('combined');
     try {
@@ -351,60 +392,67 @@ export function useBillCalculator(): UseBillCalculatorReturn {
     } finally {
       setExportingId(null);
     }
-  }
+  }, [activeRecord, splitResult, unitName]);
 
-  async function handleExportSingle(tenantId: string) {
-    if (!splitResult.isValid) return;
-    const tenantCalc = splitResult.tenantResults.find(
-      (t) => t.tenantId === tenantId
-    );
-    if (!tenantCalc) return;
-    setExportingId(tenantId);
-    try {
-      const { exportSingleTenantPdf } = await import('../pdfExport');
-      await exportSingleTenantPdf(
-        activeRecord,
-        splitResult,
-        tenantCalc,
-        unitName
+  const handleExportSingle = useCallback(
+    async (tenantId: string) => {
+      if (!splitResult.isValid) return;
+      const tenantCalc = splitResult.tenantResults.find(
+        (t) => t.tenantId === tenantId
       );
-    } finally {
-      setExportingId(null);
-    }
-  }
+      if (!tenantCalc) return;
+      setExportingId(tenantId);
+      try {
+        const { exportSingleTenantPdf } = await import('../pdfExport');
+        await exportSingleTenantPdf(
+          activeRecord,
+          splitResult,
+          tenantCalc,
+          unitName
+        );
+      } finally {
+        setExportingId(null);
+      }
+    },
+    [activeRecord, splitResult, unitName]
+  );
 
   const activeMonthTitle = `${MONTH_NAMES[activeRecord.month - 1]} ${activeRecord.year}`;
 
   return {
-    unitName,
-    setUnitName,
-    savedMonths,
-    activeRecord,
-    activeMonthTitle,
-    splitResult,
-    defaultMonthBounds,
-    isCustomPeriod,
-    saveToast,
-    exportingId,
-    quickTenantName,
-    setQuickTenantName,
-    mobileArchiveOpen,
-    handleToggleMobileArchive,
-    handleSelectMonth,
-    handleMonthOrYearChange,
-    handleBillAmountChange,
-    handlePeriodStartChange,
-    handlePeriodEndChange,
-    handleResetPeriodToFullMonth,
-    handleAddTenant,
-    handleQuickAddTenant,
-    handleUpdateTenant,
-    handleDeleteTenant,
-    handleCreateNewMonth,
-    handleDeleteMonth,
-    handleRestoreSampleData,
-    handleManualSaveConfirm,
-    handleExportCombined,
-    handleExportSingle,
+    state: {
+      unitName,
+      savedMonths,
+      activeRecord,
+      activeMonthTitle,
+      splitResult,
+      defaultMonthBounds,
+      isCustomPeriod,
+      saveToast,
+      exportingId,
+      quickTenantName,
+      mobileArchiveOpen,
+    },
+    actions: {
+      setUnitName,
+      setQuickTenantName,
+      toggleMobileArchive: handleToggleMobileArchive,
+      selectMonth: handleSelectMonth,
+      changeMonthOrYear: handleMonthOrYearChange,
+      changeBillAmount: handleBillAmountChange,
+      changePeriodStart: handlePeriodStartChange,
+      changePeriodEnd: handlePeriodEndChange,
+      resetPeriodToFullMonth: handleResetPeriodToFullMonth,
+      addTenant: handleAddTenant,
+      quickAddTenant: handleQuickAddTenant,
+      updateTenant: handleUpdateTenant,
+      deleteTenant: handleDeleteTenant,
+      createNewMonth: handleCreateNewMonth,
+      deleteMonth: handleDeleteMonth,
+      restoreSampleData: handleRestoreSampleData,
+      manualSaveConfirm: handleManualSaveConfirm,
+      exportCombined: handleExportCombined,
+      exportSingle: handleExportSingle,
+    },
   };
 }

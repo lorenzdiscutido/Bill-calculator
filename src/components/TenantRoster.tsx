@@ -9,28 +9,36 @@ import { TenantRow } from './TenantRow';
 import styles from './TenantRoster.module.css';
 
 export interface TenantRosterProps {
-  activeRecord: BillingMonthRecord;
-  tenantResults: TenantCalculationResult[];
-  fieldErrors: ValidationFieldErrors;
-  quickTenantName: string;
-  onQuickTenantNameChange: (name: string) => void;
-  onQuickAddTenant: (e: FormEvent) => void;
-  onAddTenant: () => void;
-  onUpdateTenant: (tenantId: string, patch: Partial<TenantStayInput>) => void;
-  onDeleteTenant: (tenantId: string) => void;
+  state: {
+    activeRecord: BillingMonthRecord;
+    splitResult: {
+      tenantResults: TenantCalculationResult[];
+      fieldErrors: ValidationFieldErrors;
+    };
+    quickTenantName: string;
+  };
+  actions: {
+    setQuickTenantName: (value: string) => void;
+    quickAddTenant: (e: FormEvent) => void;
+    addTenant: (nameOverride?: string) => void;
+    updateTenant: (tenantId: string, patch: Partial<TenantStayInput>) => void;
+    deleteTenant: (tenantId: string) => void;
+  };
 }
 
-export function TenantRoster({
-  activeRecord,
-  tenantResults,
-  fieldErrors,
-  quickTenantName,
-  onQuickTenantNameChange,
-  onQuickAddTenant,
-  onAddTenant,
-  onUpdateTenant,
-  onDeleteTenant,
-}: TenantRosterProps) {
+export function TenantRoster({ state, actions }: TenantRosterProps) {
+  const { activeRecord, splitResult, quickTenantName } = state;
+  const {
+    setQuickTenantName,
+    quickAddTenant,
+    addTenant,
+    updateTenant,
+    deleteTenant,
+  } = actions;
+
+  const tenantResults = splitResult.tenantResults;
+  const fieldErrors = splitResult.fieldErrors;
+
   return (
     <section className={styles.workspacePanel} aria-labelledby="tenants-heading">
       <div className={styles.sectionHeader}>
@@ -49,7 +57,7 @@ export function TenantRoster({
         <button
           type="button"
           className={`${styles.btn} ${styles.btnPrimary}`}
-          onClick={onAddTenant}
+          onClick={() => addTenant()}
         >
           <svg
             width="15"
@@ -70,7 +78,7 @@ export function TenantRoster({
       </div>
 
       {/* Quick Add Tenant Form */}
-      <form onSubmit={onQuickAddTenant} className={styles.tenantQuickAddForm}>
+      <form onSubmit={quickAddTenant} className={styles.tenantQuickAddForm}>
         <div className={styles.quickAddInputWrap}>
           <span className={styles.quickAddIcon} aria-hidden="true">
             <svg
@@ -92,7 +100,7 @@ export function TenantRoster({
             className={`${styles.inputControl} ${styles.quickAddInput}`}
             placeholder="Enter tenant name (e.g. Juan Dela Cruz) and press Enter to add..."
             value={quickTenantName}
-            onChange={(e) => onQuickTenantNameChange(e.target.value)}
+            onChange={(e) => setQuickTenantName(e.target.value)}
           />
         </div>
         <button type="submit" className={`${styles.btn} ${styles.btnSecondary}`}>
@@ -143,7 +151,7 @@ export function TenantRoster({
           <button
             type="button"
             className={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={onAddTenant}
+            onClick={() => addTenant()}
           >
             <svg
               width="15"
@@ -171,8 +179,8 @@ export function TenantRoster({
                 tenant={tenant}
                 tenantCalculation={tenantResults[index]}
                 rowError={fieldErrors.byTenantId[tenant.id]}
-                onUpdateTenant={onUpdateTenant}
-                onDeleteTenant={onDeleteTenant}
+                onUpdateTenant={updateTenant}
+                onDeleteTenant={deleteTenant}
               />
             ))}
           </div>
@@ -181,7 +189,7 @@ export function TenantRoster({
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary} ${styles.btnAddTenantWide}`}
-              onClick={onAddTenant}
+              onClick={() => addTenant()}
             >
               <svg
                 width="15"

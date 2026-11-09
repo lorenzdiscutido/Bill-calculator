@@ -5,20 +5,21 @@ import { OccupancyTimeline } from './OccupancyTimeline';
 import styles from './ResultsTable.module.css';
 
 export interface ResultsTableProps {
-  activeRecord: BillingMonthRecord;
-  splitResult: BillSplitResult;
-  exportingId: string | null;
-  onExportCombined: () => void;
-  onExportSingle: (tenantId: string) => void;
+  state: {
+    activeRecord: BillingMonthRecord;
+    splitResult: BillSplitResult;
+    exportingId: string | null;
+  };
+  actions: {
+    exportCombined: () => Promise<void> | void;
+    exportSingle: (tenantId: string) => Promise<void> | void;
+  };
 }
 
-export function ResultsTable({
-  activeRecord,
-  splitResult,
-  exportingId,
-  onExportCombined,
-  onExportSingle,
-}: ResultsTableProps) {
+export function ResultsTable({ state, actions }: ResultsTableProps) {
+  const { activeRecord, splitResult, exportingId } = state;
+  const { exportCombined, exportSingle } = actions;
+
   return (
     <section className={styles.workspacePanel} aria-labelledby="results-heading">
       <div className={styles.sectionHeader}>
@@ -35,7 +36,7 @@ export function ResultsTable({
           variant="results-header"
           isValid={splitResult.isValid}
           exportingId={exportingId}
-          onExportCombined={onExportCombined}
+          onExportCombined={exportCombined}
         />
       </div>
 
@@ -171,7 +172,7 @@ export function ResultsTable({
                       <button
                         type="button"
                         className={styles.btnGhostSm}
-                        onClick={() => onExportSingle(tCalc.tenantId)}
+                        onClick={() => exportSingle(tCalc.tenantId)}
                         disabled={exportingId !== null}
                       >
                         <svg

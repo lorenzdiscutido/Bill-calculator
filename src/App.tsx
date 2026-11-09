@@ -7,98 +7,21 @@ import { TopBar } from './components/TopBar';
 import { useBillCalculator } from './hooks/useBillCalculator';
 
 export default function App() {
-  const {
-    unitName,
-    setUnitName,
-    savedMonths,
-    activeRecord,
-    activeMonthTitle,
-    splitResult,
-    defaultMonthBounds,
-    isCustomPeriod,
-    saveToast,
-    exportingId,
-    quickTenantName,
-    setQuickTenantName,
-    mobileArchiveOpen,
-    handleToggleMobileArchive,
-    handleSelectMonth,
-    handleMonthOrYearChange,
-    handleBillAmountChange,
-    handlePeriodStartChange,
-    handlePeriodEndChange,
-    handleResetPeriodToFullMonth,
-    handleAddTenant,
-    handleQuickAddTenant,
-    handleUpdateTenant,
-    handleDeleteTenant,
-    handleCreateNewMonth,
-    handleDeleteMonth,
-    handleRestoreSampleData,
-    handleManualSaveConfirm,
-    handleExportCombined,
-    handleExportSingle,
-  } = useBillCalculator();
+  const { state, actions } = useBillCalculator();
 
   return (
     <div>
-      <TopBar
-        unitName={unitName}
-        onUnitNameChange={setUnitName}
-        saveToast={saveToast}
-        isValid={splitResult.isValid}
-        exportingId={exportingId}
-        onSaveMonth={handleManualSaveConfirm}
-        onExportCombined={handleExportCombined}
-      />
+      <TopBar state={state} actions={actions} />
 
       <div className={styles.workbenchLayout}>
-        <ArchiveRail
-          savedMonths={savedMonths}
-          activeMonthId={activeRecord.id}
-          activeMonthTitle={activeMonthTitle}
-          mobileArchiveOpen={mobileArchiveOpen}
-          onToggleMobileArchive={handleToggleMobileArchive}
-          onSelectMonth={handleSelectMonth}
-          onCreateNewMonth={handleCreateNewMonth}
-          onDeleteMonth={handleDeleteMonth}
-          onRestoreSampleData={handleRestoreSampleData}
-        />
+        <ArchiveRail state={state} actions={actions} />
 
         <main className={styles.mainWorkspace}>
-          <BillingForm
-            activeRecord={activeRecord}
-            activeMonthTitle={activeMonthTitle}
-            isCustomPeriod={isCustomPeriod}
-            defaultMonthBounds={defaultMonthBounds}
-            billingPeriodDays={splitResult.billingPeriodDays}
-            fieldErrors={splitResult.fieldErrors}
-            onMonthOrYearChange={handleMonthOrYearChange}
-            onBillAmountChange={handleBillAmountChange}
-            onPeriodStartChange={handlePeriodStartChange}
-            onPeriodEndChange={handlePeriodEndChange}
-            onResetPeriodToFullMonth={handleResetPeriodToFullMonth}
-          />
+          <BillingForm state={state} actions={actions} />
 
-          <TenantRoster
-            activeRecord={activeRecord}
-            tenantResults={splitResult.tenantResults}
-            fieldErrors={splitResult.fieldErrors}
-            quickTenantName={quickTenantName}
-            onQuickTenantNameChange={setQuickTenantName}
-            onQuickAddTenant={handleQuickAddTenant}
-            onAddTenant={() => handleAddTenant()}
-            onUpdateTenant={handleUpdateTenant}
-            onDeleteTenant={handleDeleteTenant}
-          />
+          <TenantRoster state={state} actions={actions} />
 
-          <ResultsTable
-            activeRecord={activeRecord}
-            splitResult={splitResult}
-            exportingId={exportingId}
-            onExportCombined={handleExportCombined}
-            onExportSingle={handleExportSingle}
-          />
+          <ResultsTable state={state} actions={actions} />
         </main>
       </div>
     </div>

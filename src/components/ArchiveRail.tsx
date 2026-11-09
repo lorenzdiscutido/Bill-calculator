@@ -3,28 +3,34 @@ import { BillingMonthRecord } from '../types';
 import styles from './ArchiveRail.module.css';
 
 export interface ArchiveRailProps {
-  savedMonths: BillingMonthRecord[];
-  activeMonthId: string;
-  activeMonthTitle: string;
-  mobileArchiveOpen: boolean;
-  onToggleMobileArchive: () => void;
-  onSelectMonth: (monthId: string) => void;
-  onCreateNewMonth: () => void;
-  onDeleteMonth: (monthId: string) => void;
-  onRestoreSampleData: () => void;
+  state: {
+    savedMonths: BillingMonthRecord[];
+    activeRecord: BillingMonthRecord;
+    activeMonthTitle: string;
+    mobileArchiveOpen: boolean;
+  };
+  actions: {
+    toggleMobileArchive: () => void;
+    selectMonth: (monthId: string) => void;
+    createNewMonth: () => void;
+    deleteMonth: (monthId: string) => void;
+    restoreSampleData: () => void;
+  };
 }
 
-export function ArchiveRail({
-  savedMonths,
-  activeMonthId,
-  activeMonthTitle,
-  mobileArchiveOpen,
-  onToggleMobileArchive,
-  onSelectMonth,
-  onCreateNewMonth,
-  onDeleteMonth,
-  onRestoreSampleData,
-}: ArchiveRailProps) {
+export function ArchiveRail({ state, actions }: ArchiveRailProps) {
+  const { savedMonths, activeRecord, activeMonthTitle, mobileArchiveOpen } =
+    state;
+  const {
+    toggleMobileArchive,
+    selectMonth,
+    createNewMonth,
+    deleteMonth,
+    restoreSampleData,
+  } = actions;
+
+  const activeMonthId = activeRecord.id;
+
   return (
     <aside className={styles.archiveRail} aria-label="Billing Month History">
       <div className={styles.railHeader}>
@@ -40,7 +46,7 @@ export function ArchiveRail({
           <button
             type="button"
             className={styles.btnGhostSm}
-            onClick={onCreateNewMonth}
+            onClick={createNewMonth}
           >
             <svg
               width="14"
@@ -61,7 +67,7 @@ export function ArchiveRail({
           <button
             type="button"
             className={`${styles.btnGhostSm} ${styles.mobileHistoryToggle}`}
-            onClick={onToggleMobileArchive}
+            onClick={toggleMobileArchive}
             aria-expanded={mobileArchiveOpen}
           >
             {mobileArchiveOpen ? 'Hide History ▲' : 'Past Months ▼'}
@@ -94,7 +100,7 @@ export function ArchiveRail({
                 <button
                   type="button"
                   className={styles.archiveSelectBtn}
-                  onClick={() => onSelectMonth(item.id)}
+                  onClick={() => selectMonth(item.id)}
                 >
                   <div className={styles.archiveItemTop}>
                     <div className={styles.archiveMonthTitleWrap}>
@@ -124,7 +130,7 @@ export function ArchiveRail({
                 <button
                   type="button"
                   className={styles.archiveDeleteBtn}
-                  onClick={() => onDeleteMonth(item.id)}
+                  onClick={() => deleteMonth(item.id)}
                   aria-label={`Delete ${label}`}
                   title={`Delete ${label}`}
                 >
@@ -152,7 +158,7 @@ export function ArchiveRail({
           <button
             type="button"
             className={`${styles.btn} ${styles.btnSecondary} ${styles.btnFullWidth}`}
-            onClick={onRestoreSampleData}
+            onClick={restoreSampleData}
           >
             Load Sample Dataset (3 Tenants)
           </button>

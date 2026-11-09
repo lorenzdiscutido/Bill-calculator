@@ -3,32 +3,44 @@ import { BillingMonthRecord, ValidationFieldErrors } from '../types';
 import styles from './BillingForm.module.css';
 
 export interface BillingFormProps {
-  activeRecord: BillingMonthRecord;
-  activeMonthTitle: string;
-  isCustomPeriod: boolean;
-  defaultMonthBounds: { start: string; end: string; daysInMonth: number };
-  billingPeriodDays: number;
-  fieldErrors: ValidationFieldErrors;
-  onMonthOrYearChange: (newMonth: number, newYear: number) => void;
-  onBillAmountChange: (billAmountInput: string) => void;
-  onPeriodStartChange: (periodStart: string) => void;
-  onPeriodEndChange: (periodEnd: string) => void;
-  onResetPeriodToFullMonth: () => void;
+  state: {
+    activeRecord: BillingMonthRecord;
+    activeMonthTitle: string;
+    isCustomPeriod: boolean;
+    defaultMonthBounds: { start: string; end: string; daysInMonth: number };
+    splitResult: {
+      billingPeriodDays: number;
+      fieldErrors: ValidationFieldErrors;
+    };
+  };
+  actions: {
+    changeMonthOrYear: (newMonth: number, newYear: number) => void;
+    changeBillAmount: (billAmountInput: string) => void;
+    changePeriodStart: (periodStart: string) => void;
+    changePeriodEnd: (periodEnd: string) => void;
+    resetPeriodToFullMonth: () => void;
+  };
 }
 
-export function BillingForm({
-  activeRecord,
-  activeMonthTitle,
-  isCustomPeriod,
-  defaultMonthBounds,
-  billingPeriodDays,
-  fieldErrors,
-  onMonthOrYearChange,
-  onBillAmountChange,
-  onPeriodStartChange,
-  onPeriodEndChange,
-  onResetPeriodToFullMonth,
-}: BillingFormProps) {
+export function BillingForm({ state, actions }: BillingFormProps) {
+  const {
+    activeRecord,
+    activeMonthTitle,
+    isCustomPeriod,
+    defaultMonthBounds,
+    splitResult,
+  } = state;
+  const {
+    changeMonthOrYear,
+    changeBillAmount,
+    changePeriodStart,
+    changePeriodEnd,
+    resetPeriodToFullMonth,
+  } = actions;
+
+  const billingPeriodDays = splitResult.billingPeriodDays;
+  const fieldErrors = splitResult.fieldErrors;
+
   return (
     <section className={styles.workspacePanel} aria-labelledby="setup-heading">
       <div className={styles.sectionHeader}>
@@ -45,7 +57,7 @@ export function BillingForm({
           <button
             type="button"
             className={styles.btnGhostSm}
-            onClick={onResetPeriodToFullMonth}
+            onClick={resetPeriodToFullMonth}
           >
             Reset to Full Month ({defaultMonthBounds.start} –{' '}
             {defaultMonthBounds.end})
@@ -65,10 +77,7 @@ export function BillingForm({
             className={styles.selectControl}
             value={activeRecord.month}
             onChange={(e) =>
-              onMonthOrYearChange(
-                Number(e.target.value),
-                activeRecord.year
-              )
+              changeMonthOrYear(Number(e.target.value), activeRecord.year)
             }
           >
             {MONTH_NAMES.map((mName, idx) => (
@@ -93,7 +102,7 @@ export function BillingForm({
             className={`${styles.inputControl} tabular`}
             value={activeRecord.year}
             onChange={(e) =>
-              onMonthOrYearChange(
+              changeMonthOrYear(
                 activeRecord.month,
                 Number.parseInt(e.target.value, 10)
               )
@@ -120,7 +129,7 @@ export function BillingForm({
                 fieldErrors.billAmount ? styles.isInvalid : ''
               }`}
               value={activeRecord.billAmountInput}
-              onChange={(e) => onBillAmountChange(e.target.value)}
+              onChange={(e) => changeBillAmount(e.target.value)}
               placeholder="0.00"
             />
           </div>
@@ -154,7 +163,7 @@ export function BillingForm({
                   fieldErrors.periodDates ? styles.isInvalid : ''
                 }`}
                 value={activeRecord.periodStart}
-                onChange={(e) => onPeriodStartChange(e.target.value)}
+                onChange={(e) => changePeriodStart(e.target.value)}
               />
             </div>
             <div className={styles.dateInputWrap}>
@@ -166,7 +175,7 @@ export function BillingForm({
                   fieldErrors.periodDates ? styles.isInvalid : ''
                 }`}
                 value={activeRecord.periodEnd}
-                onChange={(e) => onPeriodEndChange(e.target.value)}
+                onChange={(e) => changePeriodEnd(e.target.value)}
               />
             </div>
           </div>
